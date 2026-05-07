@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--
+  SHOP PRODUCT PAGE TEMPLATE
+  ──────────────────────────
+  To add a new shop item:
+  1. Duplicate this file and rename it to your-product-slug.html
+  2. Replace every PRODUCT_* placeholder below
+  3. Place product images in ../media/shop/SLUG/
+     - view-01.jpg  (main shot)
+     - view-02.jpg  (reverse / alt angle)
+     - view-03.jpg  (detail)
+     - view-04.jpg  (in situ / scale reference)
+  4. Add an entry to the PRODUCTS array in ../shop.html with link: 'shop/SLUG.html'
+  5. Add this item as a related card in the other product pages
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRODUCT_TITLE — Shop — J.SALIBA</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body class="page">
+
+<nav id="nav" class="light">
+  <a href="../index.html" class="nav-logo">J<span class="dot">.</span>SALIBA</a>
+  <div class="nav-links">
+    <a href="../work.html">Work</a>
+    <a href="../about.html">About</a>
+    <a href="../shop.html" class="active">Shop</a>
+    <a href="../inquiry.html">Inquiry</a>
+  </div>
+  <button class="nav-burger" id="burger" aria-label="Menu"><span></span><span></span></button>
+</nav>
+
+<div id="nav-overlay">
+  <button id="nav-close">&#x2715; Close</button>
+  <a href="../work.html">Work</a>
+  <a href="../about.html">About</a>
+  <a href="../shop.html">Shop</a>
+  <a href="../inquiry.html">Inquiry</a>
+</div>
+
+<!-- PRODUCT LAYOUT: gallery left / info right -->
+<div class="shop-product-layout">
+
+  <!-- GALLERY ─ left column -->
+  <div class="shop-gallery">
+
+    <!-- Main image — swap placeholder div for <img> when you have media -->
+    <div class="shop-gallery-main" id="gallery-main">
+      <!-- <img src="../media/shop/SLUG/view-01.jpg" alt="PRODUCT_TITLE" id="gallery-main-img"> -->
+      <div id="gallery-placeholder" style="width:100%;height:100%;background:PRODUCT_COLOR;display:flex;align-items:center;justify-content:center;">
+        <span class="gallery-placeholder-label" id="gallery-label">VIEW 01</span>
+      </div>
+    </div>
+
+    <!-- Thumbnails — add ../media/shop/SLUG/view-0X.jpg as src when ready -->
+    <div class="shop-gallery-thumbs">
+      <div class="shop-gallery-thumb active" data-label="VIEW 01" onclick="switchView(this,'PRODUCT_COLOR')">
+        <div style="width:100%;height:100%;background:PRODUCT_COLOR;display:flex;align-items:center;justify-content:center;">
+          <span class="thumb-label">01</span>
+        </div>
+      </div>
+      <div class="shop-gallery-thumb" data-label="VIEW 02" onclick="switchView(this,'PRODUCT_COLOR_D1')">
+        <div style="width:100%;height:100%;background:PRODUCT_COLOR_D1;display:flex;align-items:center;justify-content:center;">
+          <span class="thumb-label">02</span>
+        </div>
+      </div>
+      <div class="shop-gallery-thumb" data-label="DETAIL" onclick="switchView(this,'PRODUCT_COLOR_D2')">
+        <div style="width:100%;height:100%;background:PRODUCT_COLOR_D2;display:flex;align-items:center;justify-content:center;">
+          <span class="thumb-label">03</span>
+        </div>
+      </div>
+      <div class="shop-gallery-thumb" data-label="IN SITU" onclick="switchView(this,'PRODUCT_COLOR_D3')">
+        <div style="width:100%;height:100%;background:PRODUCT_COLOR_D3;display:flex;align-items:center;justify-content:center;">
+          <span class="thumb-label">04</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INFO ─ right column, sticky -->
+  <div class="shop-info">
+
+    <div class="shop-breadcrumb">
+      <a href="../shop.html">Shop</a>
+      <span>/</span>
+      <span>PRODUCT_TYPE</span>
+    </div>
+
+    <span class="shop-type-tag">PRODUCT_TYPE</span>
+    <div class="shop-item-edition">PRODUCT_EDITION</div>
+    <h1 class="shop-item-title">PRODUCT TITLE</h1>
+
+    <div class="shop-price-group">
+      <span class="shop-price-label">Price</span>
+      <div class="shop-item-price">&euro;000</div>
+    </div>
+
+    <div class="shop-cta-group">
+      <!-- Available: -->
+      <button class="btn-purchase" onclick="window.open('STRIPE_LINK','_blank')">Purchase &rarr;</button>
+      <!-- Sold out: replace the above with: -->
+      <!-- <button class="btn-purchase" disabled>Sold Out</button> -->
+      <a class="btn-enquire" href="../inquiry.html">Enquire &rarr;</a>
+    </div>
+
+    <div class="shop-specs">
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Format</span>
+        <span class="shop-spec-value">FORMAT_VALUE</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Material</span>
+        <span class="shop-spec-value">MATERIAL_VALUE</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Dimensions</span>
+        <span class="shop-spec-value">DIMENSIONS_VALUE</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Year</span>
+        <span class="shop-spec-value">20XX</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Edition</span>
+        <span class="shop-spec-value">EDITION_DETAIL</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ABOUT THIS WORK -->
+<div class="shop-item-body">
+  <div class="shop-item-body-label">
+    <span class="s-label">About</span>
+  </div>
+  <div class="shop-item-body-content">
+    <div class="shop-long-desc">
+      <p>
+        First paragraph: describe the work, its origin, concept, or connection to a project in the portfolio.
+      </p>
+      <p>
+        Second paragraph: materials, process, and what makes this edition special. Mention the print run, production method, and any certificates or signatures included.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY & RETURNS -->
+<div class="shop-item-body">
+  <div class="shop-item-body-label">
+    <span class="s-label">Delivery</span>
+  </div>
+  <div class="shop-item-body-content">
+    <div class="delivery-grid">
+      <div class="delivery-item">
+        <span class="delivery-item-label">Shipping</span>
+        <span class="delivery-item-value">Worldwide. Flat rate &euro;12 EU / &euro;18 international. Tracked and insured.</span>
+      </div>
+      <div class="delivery-item">
+        <span class="delivery-item-label">Dispatch</span>
+        <span class="delivery-item-value">Within 5&ndash;7 working days of purchase confirmation.</span>
+      </div>
+      <div class="delivery-item">
+        <span class="delivery-item-label">Packaging</span>
+        <span class="delivery-item-value">Archival packaging. Rigid board mailer. No plastic.</span>
+      </div>
+      <div class="delivery-item">
+        <span class="delivery-item-label">Returns</span>
+        <span class="delivery-item-value">Not accepted for limited editions. Contact us if the item arrives damaged.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELATED ITEMS -->
+<div class="shop-related-wrap">
+  <div class="shop-related-header">
+    <span>Other Editions</span>
+    <a href="../shop.html">View all &rarr;</a>
+  </div>
+  <!-- Related product cards go here — copy .product-card markup from shop.html -->
+  <div class="shop-grid" id="related-grid">
+    <!-- RELATED CARD 1 -->
+    <!-- RELATED CARD 2 -->
+  </div>
+</div>
+
+<footer>
+  <span class="f-logo">J<span class="dot">.</span>SALIBA</span>
+  <div class="f-links">
+    <a href="../work.html">Work</a>
+    <a href="../about.html">About</a>
+    <a href="../shop.html">Shop</a>
+    <a href="../inquiry.html">Inquiry</a>
+    <a href="../index.html">Mind Map</a>
+  </div>
+  <span class="f-copy">&copy; 2025 Jacob Saliba</span>
+</footer>
+
+<script>
+function switchView(thumb, color) {
+  document.querySelectorAll('.shop-gallery-thumb').forEach(function(t) { t.classList.remove('active'); });
+  thumb.classList.add('active');
+  document.getElementById('gallery-placeholder').style.background = color;
+  document.getElementById('gallery-label').textContent = thumb.dataset.label;
+}
+
+document.getElementById('burger').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.add('open');
+});
+document.getElementById('nav-close').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.remove('open');
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('nav-overlay').classList.remove('open');
+});
+</script>
+
+<!-- LEGO CURSOR -->
+<style>* { cursor: none !important; }</style>
+<script>
+(function () {
+  var COLORS = ['#e63946','#ff6b35','#ffd166','#06d6a0','#118ab2','#9b5de5','#f15bb5','#00bbf9'];
+  var SHAPES  = [[1,1],[2,1],[2,2],[4,1],[4,2],[3,1],[2,3],[1,4]];
+  var brickIdx=0, colorIdx=0, animScale=1, animId=null, mx=-300, my=-300, currentZone=null;
+  var dpr = window.devicePixelRatio || 1;
+  var el = document.createElement('canvas');
+  el.style.cssText = 'position:fixed;top:-300px;left:-300px;pointer-events:none;z-index:9999;transition:opacity .15s;';
+  document.body.appendChild(el);
+  function ph(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  function rs(r,g,b){return'rgb('+r+','+g+','+b+')';}
+  function lighten(h,f){var c=ph(h);return rs(~~Math.min(255,c[0]+(255-c[0])*f),~~Math.min(255,c[1]+(255-c[1])*f),~~Math.min(255,c[2]+(255-c[2])*f));}
+  function darken(h,f){var c=ph(h);return rs(~~(c[0]*(1-f)),~~(c[1]*(1-f)),~~(c[2]*(1-f)));}
+  function draw(){
+    var cols=SHAPES[brickIdx][0],rows=SHAPES[brickIdx][1],hex=COLORS[colorIdx],sc=animScale;
+    var u=11,bh=8,sH=4,pad=4,sRx=u*0.30,sRy=sRx*0.55;
+    var cW=(cols+rows)*u+pad*2, cH=(cols+rows)*u*0.5+bh+sH+pad*2;
+    el.width=Math.ceil(cW*sc*dpr); el.height=Math.ceil(cH*sc*dpr);
+    el.style.width=Math.ceil(cW*sc)+'px'; el.style.height=Math.ceil(cH*sc)+'px';
+    var ctx=el.getContext('2d'); ctx.clearRect(0,0,el.width,el.height); ctx.save(); ctx.scale(sc*dpr,sc*dpr);
+    var ox=rows*u+pad, oy=sH+pad;
+    function iX(c,r){return ox+(c-r)*u;} function iY(c,r){return oy+(c+r)*u*0.5;}
+    var cT=lighten(hex,0.30),cB=hex,cD=darken(hex,0.32),cST=lighten(hex,0.55);
+    ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(iX(0,rows),iY(0,rows));ctx.lineTo(iX(0,rows),iY(0,rows)+bh);ctx.lineTo(iX(cols,rows),iY(cols,rows)+bh);ctx.lineTo(iX(cols,rows),iY(cols,rows));ctx.closePath();
+    ctx.fillStyle=cD;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.65)';ctx.lineWidth=0.6;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(iX(cols,0),iY(cols,0));ctx.lineTo(iX(cols,0),iY(cols,0)+bh);ctx.lineTo(iX(cols,rows),iY(cols,rows)+bh);ctx.lineTo(iX(cols,rows),iY(cols,rows));ctx.closePath();
+    ctx.fillStyle=cB;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.65)';ctx.lineWidth=0.6;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(iX(0,0),iY(0,0));ctx.lineTo(iX(cols,0),iY(cols,0));ctx.lineTo(iX(cols,rows),iY(cols,rows));ctx.lineTo(iX(0,rows),iY(0,rows));ctx.closePath();
+    ctx.fillStyle=cT;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.65)';ctx.lineWidth=0.6;ctx.stroke();
+    for(var d=0;d<cols+rows;d++){for(var c2=0;c2<cols;c2++){var r2=d-c2;if(r2<0||r2>=rows)continue;
+      var sx=iX(c2+0.5,r2+0.5),sy=iY(c2+0.5,r2+0.5);
+      ctx.beginPath();ctx.moveTo(sx-sRx,sy);ctx.lineTo(sx-sRx,sy-sH);ctx.ellipse(sx,sy-sH,sRx,sRy,0,Math.PI,0,true);ctx.lineTo(sx+sRx,sy);ctx.ellipse(sx,sy,sRx,sRy,0,0,Math.PI,false);ctx.closePath();
+      ctx.fillStyle=cT;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=0.4;ctx.stroke();
+      ctx.beginPath();ctx.ellipse(sx,sy-sH,sRx,sRy,0,0,Math.PI*2);ctx.fillStyle=cST;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=0.4;ctx.stroke();
+    }}
+    ctx.restore();
+    el.style.left=(mx-ox*sc)+'px'; el.style.top=(my-oy*sc)+'px';
+  }
+  function popAnim(){if(animId)cancelAnimationFrame(animId);var t0=performance.now();(function pop(){var t=Math.min(1,(performance.now()-t0)/260);animScale=1+0.45*Math.pow(1-t,2);draw();if(t<1){animId=requestAnimationFrame(pop);}else{animScale=1;animId=null;}})();}
+  function getZone(target){return target.closest&&(target.closest('.shop-gallery')||target.closest('.shop-info')||target.closest('.shop-item-body')||target.closest('.shop-related-wrap')||target.closest('.product-card')||target.closest('#nav')||target.closest('footer'))||null;}
+  document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;el.style.opacity='1';draw();});
+  document.addEventListener('mouseover',function(e){var zone=getZone(e.target);if(zone&&zone!==currentZone){currentZone=zone;brickIdx=(brickIdx+1)%SHAPES.length;colorIdx=(colorIdx+1)%COLORS.length;popAnim();}});
+  document.addEventListener('mouseleave',function(){el.style.opacity='0';});
+  document.addEventListener('mouseenter',function(){el.style.opacity='1';});
+  draw();
+})();
+</script>
+</body>
+</html>

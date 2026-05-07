@@ -1,0 +1,29 @@
+# Astro build & cache
+dist/
+.astro/
+src/
+public/
+astro.config.mjs
+tsconfig.json
+
+# Node
+node_modules/
+package.json
+package-lock.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.example
+
+# Internal
+CLAUDE_1.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp

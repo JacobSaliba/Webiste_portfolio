@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Research Mind Map</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Arial Black', Arial, sans-serif; }
+#c { display: block; }
+
+/* ---- HINTS ---- */
+#hints {
+  position: absolute; top: 22px; left: 22px;
+  color: #444; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; line-height: 2;
+  pointer-events: none; text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+
+/* ---- WATERMARK ---- */
+#watermark {
+  position: absolute; bottom: -18px; left: -4px;
+  font-size: 120px; font-weight: 900;
+  color: #c00;
+  line-height: 0.84;
+  letter-spacing: -4px;
+  pointer-events: none; user-select: none;
+  font-family: 'Arial Black', Impact, Arial, sans-serif;
+}
+
+/* ---- PANEL ---- */
+#panel {
+  position: absolute; top: 0; right: 0;
+  width: 295px; height: 100vh;
+  background: #141414;
+  border-left: 1px solid #252525;
+  display: flex; flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+}
+
+#panel-header {
+  background: #c00;
+  padding: 18px 20px 15px;
+  flex-shrink: 0;
+}
+#panel-title {
+  font-size: 19px; font-weight: 900;
+  color: #fff; letter-spacing: 2.5px; text-transform: uppercase;
+  font-family: 'Arial Black', Arial, sans-serif;
+}
+#panel-sub {
+  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.75);
+  letter-spacing: 2px; margin-top: 4px; text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+
+#panel-body { flex: 1; overflow-y: auto; }
+
+#sel-info {
+  padding: 13px 20px;
+  color: #666; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  border-bottom: 1px solid #1e1e1e;
+  font-family: Arial, sans-serif;
+}
+
+.psec {
+  padding: 14px 20px;
+  border-bottom: 1px solid #1e1e1e;
+}
+.plabel {
+  font-size: 8.5px; font-weight: 700; color: #555;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 9px; font-family: Arial, sans-serif;
+}
+
+/* Y nudge row */
+.yrow { display: flex; align-items: center; gap: 6px; }
+.ibtn {
+  background: #1e1e1e; border: 1px solid #2e2e2e;
+  color: #888; width: 36px; height: 36px; border-radius: 3px;
+  font-size: 14px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+.ibtn:hover { background: #2a2a2a; color: #fff; }
+#y-val {
+  color: #666; font-size: 11px; font-family: monospace;
+  letter-spacing: 1px; margin-left: 4px;
+}
+
+/* Inputs */
+.irow { display: flex; gap: 6px; }
+.pinput {
+  flex: 1; background: #1c1c1c;
+  border: 1px solid #2e2e2e; border-radius: 3px;
+  color: #bbb; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 1px; padding: 0 10px; height: 36px;
+  text-transform: uppercase; font-family: Arial, sans-serif;
+  outline: none;
+}
+.pinput::placeholder { color: #383838; }
+.pinput:focus { border-color: #444; }
+.abtn {
+  background: #1e1e1e; border: 1px solid #2e2e2e;
+  color: #888; width: 36px; height: 36px; font-size: 20px;
+  cursor: pointer; border-radius: 3px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.abtn:hover { background: #2a2a2a; color: #fff; }
+
+/* Connect button */
+#btn-connect {
+  width: 100%; height: 38px;
+  background: #1a5fb4; border: none;
+  color: #fff; font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; font-family: Arial, sans-serif;
+  transition: background 0.12s;
+}
+#btn-connect:hover { background: #2470cc; }
+#btn-connect.active { background: #990000; }
+
+/* Remove button */
+#btn-remove {
+  width: 100%; height: 34px; margin-top: 8px;
+  background: transparent; border: 1px solid #2e2e2e;
+  color: #555; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; cursor: pointer; border-radius: 3px;
+  text-transform: uppercase; font-family: Arial, sans-serif;
+  display: none;
+}
+#btn-remove:hover { border-color: #c00; color: #c00; }
+
+/* ---- LEGEND ---- */
+#legend {
+  position: absolute; bottom: 16px; right: 311px;
+  background: rgba(8,8,8,0.9);
+  border: 1px solid #222;
+  padding: 10px 14px; z-index: 5;
+}
+.ltitle {
+  font-size: 8px; font-weight: 700; color: #444;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 9px; font-family: Arial, sans-serif;
+}
+.litem {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 8.5px; color: #555; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 6px;
+  font-family: Arial, sans-serif; font-weight: 700;
+}
+.lline { width: 22px; height: 1px; background: #777; display: block; }
+
+/* ---- NODE LABELS ---- */
+.node-label {
+  position: absolute; pointer-events: none;
+  transform: translate(-50%, 0);
+  color: #fff; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px; text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 5px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.9);
+  white-space: pre-line; line-height: 1.3; max-width: 80px;
+  font-family: Arial, sans-serif;
+}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div id="labels"></div>
+
+<div id="hints">
+  <div>DRAG &rarr; ORBIT</div>
+  <div>SHIFT+DRAG &rarr; PAN</div>
+  <div>DRAG BRICK &rarr; MOVE X/Z</div>
+  <div>SHIFT+DRAG BRICK &rarr; MOVE Y</div>
+  <div>SCROLL &rarr; ZOOM</div>
+</div>
+
+<div id="watermark">RE<br>SEARCH</div>
+
+<div id="panel">
+  <div id="panel-header">
+    <div id="panel-title">RESEARCH MAP</div>
+    <div id="panel-sub">DRAG BRICKS &middot; DRAW CONNECTIONS</div>
+  </div>
+  <div id="panel-body">
+    <div id="sel-info">&larr; SELECT A NODE</div>
+
+    <div class="psec">
+      <div class="plabel">VERTICAL POSITION</div>
+      <div class="yrow">
+        <button class="ibtn" id="btn-ydn">&#9660;</button>
+        <button class="ibtn" id="btn-yup">&#9650;</button>
+        <span id="y-val">--</span>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="plabel">ADD CHILD NODE</div>
+      <div class="irow">
+        <input class="pinput" id="child-input" placeholder="CHILD THOUGHT..." />
+        <button class="abtn" id="btn-child">+</button>
+      </div>
+    </div>
+
+    <div class="psec">
+      <div class="plabel">CROSS-CONNECT NODES</div>
+      <button id="btn-connect">&rarr; CONNECT</button>
+    </div>
+
+    <div class="psec">
+      <div class="plabel">ADD FREE-FLOATING THOUGHT</div>
+      <div class="irow">
+        <input class="pinput" id="free-input" placeholder="YOUR THOUGHT..." />
+        <button class="abtn" id="btn-free">+</button>
+      </div>
+      <button id="btn-remove">&#x2715; REMOVE SELECTED NODE</button>
+    </div>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="ltitle">CONNECTION TYPES</div>
+  <div class="litem"><span class="lline"></span>SPOKE / CHILD</div>
+  <div class="litem"><span class="lline"></span>CROSS-CONNECT</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var PALETTE = [
+  0xe63946, 0xff6b35, 0xffd166, 0x06d6a0, 0x118ab2,
+  0x9b5de5, 0xf15bb5, 0x00bbf9, 0xfee440, 0x80b918
+];
+var MAIN_NODES = [
+  { name: 'IMMERSIVE\nSTORYTELLING',   hex: 0xe63946 },
+  { name: 'SYSTEMIC ART',              hex: 0xff6b35 },
+  { name: 'AI STORYTELLING',           hex: 0xffd166 },
+  { name: 'CULTURAL HERITAGE',         hex: 0x06d6a0 },
+  { name: 'XR',                        hex: 0x118ab2 },
+  { name: 'GAMIFICATION',              hex: 0x9b5de5 },
+  { name: 'SPATIAL AUDIO',             hex: 0xf15bb5 },
+  { name: 'EXPERIENCE DESIGN',         hex: 0x00bbf9 },
+  { name: 'DIGITISATION',              hex: 0xfee440 },
+  { name: 'INTERACTIVE\nINSTALLATIONS',hex: 0x80b918 }
+];
+
+var PANEL_W = 295;
+var W = window.innerWidth;
+var H = window.innerHeight;
+
+var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.setClearColor(0x000000, 1);
+
+var scene  = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(52, W / H, 0.1, 1000);
+
+var amb = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(amb);
+
+var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(20, 30, 20);
+sun.castShadow = true;
+scene.add(sun);
+
+var fill = new THREE.DirectionalLight(0x4466ff, 0.28);
+fill.position.set(-15, 8, -20);
+scene.add(fill);
+
+var sTheta    = 0.38;
+var sPhi      = 1.08;
+var sRadius   = 55;
+var panTarget = new THREE.Vector3(0, 0, 0);
+
+function syncCam() {
+  var sp = Math.sin(sPhi);
+  var cp = Math.cos(sPhi);
+  var st = Math.sin(sTheta);
+  var ct = Math.cos(sTheta);
+  camera.position.set(
+    panTarget.x + sRadius * sp * st,
+    panTarget.y + sRadius * cp,
+    panTarget.z + sRadius * sp * ct
+  );
+  camera.lookAt(panTarget);
+}
+syncCam();
+
+function makeBrick(hex, bw, bh, bd) {
+  var grp  = new THREE.Group();
+  var col  = new THREE.Color(hex);
+  var dark = col.clone().multiplyScalar(0.48);
+  var matTop  = new THREE.MeshLambertMaterial({ color: col });
+  var matDark = new THREE.MeshLambertMaterial({ color: dark });
+  var matEdge = new THREE.LineBasicMaterial({ color: 0x000000 });
+  var bodyGeo = new THREE.BoxGeometry(bw, bh, bd);
+  var body = new THREE.Mesh(bodyGeo, matTop);
+  body.castShadow = true; body.receiveShadow = true;
+  grp.add(body);
+  var edgeGeo = new THREE.EdgesGeometry(bodyGeo);
+  grp.add(new THREE.LineSegments(edgeGeo, matEdge));
+  var sR = 0.27; var sH = 0.20;
+  var nX = Math.max(1, Math.round(bw / 1.1));
+  var nZ = Math.max(1, Math.round(bd / 1.1));
+  var sGeo = new THREE.CylinderGeometry(sR, sR, sH, 8);
+  var si, sk, stud;
+  for (si = 0; si < nX; si++) {
+    for (sk = 0; sk < nZ; sk++) {
+      stud = new THREE.Mesh(sGeo, matTop);
+      stud.position.set(
+        -bw / 2 + (si + 0.5) * (bw / nX),
+        bh / 2 + sH / 2,
+        -bd / 2 + (sk + 0.5) * (bd / nZ)
+      );
+      grp.add(stud);
+    }
+  }
+  var strGeo = new THREE.BoxGeometry(bw, 0.16, bd);
+  var strip  = new THREE.Mesh(strGeo, matDark);
+  strip.position.y = -bh / 2 + 0.08;
+  grp.add(strip);
+  return grp;
+}
+
+var allNodes  = [];
+var connList  = [];
+var palIdx    = 0;
+var labelsDiv = document.getElementById('labels');
+
+function nextHex() {
+  var h = PALETTE[palIdx % PALETTE.length];
+  palIdx++;
+  return h;
+}
+
+var CENTRE = {
+  grp: { position: new THREE.Vector3(0, 0, 0) },
+  hex: null, name: 'centre', label: null
+};
+
+var selectedNd = null;
+
+function updatePanel() {
+  var selInfo   = document.getElementById('sel-info');
+  var yVal      = document.getElementById('y-val');
+  var btnRemove = document.getElementById('btn-remove');
+  if (selectedNd) {
+    selInfo.textContent = selectedNd.name.replace('\n', ' ');
+    yVal.textContent    = selectedNd.grp.position.y.toFixed(1);
+    btnRemove.style.display = 'block';
+  } else {
+    selInfo.textContent = '← SELECT A NODE';
+    yVal.textContent    = '--';
+    btnRemove.style.display = 'none';
+  }
+}
+
+function selectNode(nd) {
+  if (selectedNd && selectedNd.label) {
+    selectedNd.label.style.color = '#fff';
+  }
+  selectedNd = nd;
+  if (nd && nd.label) {
+    nd.label.style.color = '#ffff88';
+  }
+  updatePanel();
+}
+
+function spawnNode(name, hex, x, y, z, parentNd, doAnimate) {
+  var BW = 2.2; var BH = 1.1; var BD = 2.2;
+  var grp = makeBrick(hex, BW, BH, BD);
+  grp.position.set(x, y, z);
+  scene.add(grp);
+  var lbl = document.createElement('div');
+  lbl.className   = 'node-label';
+  lbl.textContent = name;
+  labelsDiv.appendChild(lbl);
+  var nd = { grp: grp, name: name, hex: hex, label: lbl, idx: allNodes.length, bw: BW, bh: BH, bd: BD };
+  allNodes.push(nd);
+  (function capture(ref) {
+    grp.traverse(function(obj) {
+      if (obj.isMesh || obj.isLine) obj.userData.nidx = ref.idx;
+    });
+  })(nd);
+  if (parentNd !== null && parentNd !== undefined) addConn(parentNd, nd);
+  if (doAnimate) {
+    grp.scale.set(0.01, 0.01, 0.01);
+    var t0 = performance.now();
+    function pop() {
+      var p = Math.min(1, (performance.now() - t0) / 380);
+      var s = 1 - Math.pow(1 - p, 3);
+      grp.scale.set(s, s, s);
+      if (p < 1) requestAnimationFrame(pop);
+    }
+    requestAnimationFrame(pop);
+  }
+  return nd;
+}
+
+function connColor(na, nb) {
+  if (na && na.hex) return na.hex;
+  if (nb && nb.hex) return nb.hex;
+  return 0xffffff;
+}
+
+function makeCurveGeo(pA, pB) {
+  var mid   = pA.clone().lerp(pB, 0.5);
+  mid.y    += 3.5;
+  var curve = new THREE.QuadraticBezierCurve3(pA, mid, pB);
+  return new THREE.BufferGeometry().setFromPoints(curve.getPoints(32));
+}
+
+function makeConnLine(na, nb) {
+  var pA  = na.grp.position.clone();
+  var pB  = nb.grp.position.clone();
+  var geo = makeCurveGeo(pA, pB);
+  var mat = new THREE.LineBasicMaterial({
+    color: new THREE.Color(connColor(na, nb)),
+    transparent: true, opacity: 0.88
+  });
+  return new THREE.Line(geo, mat);
+}
+
+function addConn(na, nb) {
+  var ln = makeConnLine(na, nb);
+  scene.add(ln);
+  connList.push({ na: na, nb: nb, line: ln });
+}
+
+function refreshConn(c) {
+  var pA = c.na.grp.position.clone();
+  var pB = c.nb.grp.position.clone();
+  c.line.geometry.dispose();
+  c.line.geometry = makeCurveGeo(pA, pB);
+}
+
+function refreshAllConns() {
+  for (var i = 0; i < connList.length; i++) refreshConn(connList[i]);
+}
+
+function initNodes() {
+  var count  = MAIN_NODES.length;
+  var radius = 22;
+  for (var i = 0; i < count; i++) {
+    var angle = (i / count) * Math.PI * 2;
+    var x = radius * Math.cos(angle);
+    var z = radius * Math.sin(angle);
+    var y = (Math.random() - 0.5) * 4;
+    spawnNode(MAIN_NODES[i].name, MAIN_NODES[i].hex, x, y, z, CENTRE, false);
+  }
+}
+initNodes();
+
+var _v    = new THREE.Vector3();
+var _vBot = new THREE.Vector3();
+
+function syncLabels() {
+  for (var i = 0; i < allNodes.length; i++) {
+    var nd = allNodes[i];
+    if (!nd.label) continue;
+    _v.copy(nd.grp.position);
+    _v.project(camera);
+    if (_v.z >= 1) { nd.label.style.display = 'none'; continue; }
+    var sx = (_v.x * 0.5 + 0.5) * W;
+    if (sx > W - PANEL_W - 10) { nd.label.style.display = 'none'; continue; }
+    _vBot.copy(nd.grp.position);
+    _vBot.y -= nd.bh / 2 + 0.3;
+    _vBot.project(camera);
+    nd.label.style.display = 'block';
+    nd.label.style.left = ((_vBot.x * 0.5 + 0.5) * W) + 'px';
+    nd.label.style.top  = ((_vBot.y * -0.5 + 0.5) * H + 4) + 'px';
+  }
+}
+
+var rc   = new THREE.Raycaster();
+var mNDC = new THREE.Vector2();
+
+function setNDC(e) {
+  var r  = renderer.domElement.getBoundingClientRect();
+  mNDC.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
+  mNDC.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
+}
+
+function pickNode(e) {
+  if (e.clientX > W - PANEL_W) return null;
+  setNDC(e);
+  rc.setFromCamera(mNDC, camera);
+  var meshes = [];
+  for (var i = 0; i < allNodes.length; i++) {
+    allNodes[i].grp.traverse(function(o) { if (o.isMesh) meshes.push(o); });
+  }
+  var hits = rc.intersectObjects(meshes);
+  if (!hits.length) return null;
+  var nidx = hits[0].object.userData.nidx;
+  if (nidx === undefined || nidx === null) return null;
+  return allNodes[nidx];
+}
+
+var dragNd           = null;
+var dragPlaneH       = new THREE.Plane();
+var plHit            = new THREE.Vector3();
+var dragOff          = new THREE.Vector3();
+var dragVertical     = false;
+var dragStartMouseY  = 0;
+var dragStartWorldY  = 0;
+var dragged          = false;
+var orbiting         = false;
+var orb = { x: 0, y: 0, theta: 0, phi: 0 };
+var panning          = false;
+var panStart         = { x: 0, y: 0 };
+var _panRight        = new THREE.Vector3();
+var _panUp           = new THREE.Vector3(0, 1, 0);
+var connMode  = false;
+var connFirst = null;
+
+var cvs = document.getElementById('c');
+
+cvs.addEventListener('mousedown', function(e) {
+  if (e.clientX > W - PANEL_W) return;
+  if (e.button !== 0) return;
+
+  if (connMode) {
+    var hit = pickNode(e);
+    if (hit) {
+      if (!connFirst) {
+        connFirst = hit;
+        hit.label.style.textDecoration = 'underline';
+      } else {
+        addConn(connFirst, hit);
+        connFirst.label.style.textDecoration = '';
+        connFirst = null;
+        document.getElementById('btn-connect').classList.remove('active');
+        document.getElementById('btn-connect').textContent = '→ CONNECT';
+        connMode = false;
+      }
+    }
+    return;
+  }
+
+  var hit = pickNode(e);
+  if (hit) {
+    dragNd           = hit;
+    dragged          = false;
+    dragVertical     = e.shiftKey;
+    dragStartMouseY  = e.clientY;
+    dragStartWorldY  = hit.grp.position.y;
+
+    if (!dragVertical) {
+      setNDC(e);
+      rc.setFromCamera(mNDC, camera);
+      dragPlaneH.set(new THREE.Vector3(0, 1, 0), -hit.grp.position.y);
+      if (rc.ray.intersectPlane(dragPlaneH, plHit)) {
+        dragOff.copy(hit.grp.position).sub(plHit);
+      } else { dragOff.set(0, 0, 0); }
+    }
+    return;
+  }
+
+  // Shift + left-click on empty space = pan
+  if (e.shiftKey) {
+    panning    = true;
+    panStart.x = e.clientX;
+    panStart.y = e.clientY;
+    return;
+  }
+
+  // Plain left-click on empty space = orbit
+  selectNode(null);
+  orbiting  = true;
+  orb.x     = e.clientX;
+  orb.y     = e.clientY;
+  orb.theta = sTheta;
+  orb.phi   = sPhi;
+});
+
+cvs.addEventListener('mousemove', function(e) {
+  if (dragNd) {
+    dragged = true;
+    if (dragVertical) {
+      // Y-only: map screen mouse delta directly to world Y. X and Z never change.
+      var screenDelta = dragStartMouseY - e.clientY;   // up = positive
+      var worldDelta  = (screenDelta / H) * sRadius * 1.2;
+      var newY = dragStartWorldY + worldDelta;
+      dragNd.grp.position.y = newY;
+    } else {
+      // XZ horizontal: intersect horizontal plane, X and Z change, Y locked
+      setNDC(e);
+      rc.setFromCamera(mNDC, camera);
+      if (rc.ray.intersectPlane(dragPlaneH, plHit)) {
+        dragNd.grp.position.x = plHit.x + dragOff.x;
+        dragNd.grp.position.z = plHit.z + dragOff.z;
+      }
+    }
+    refreshAllConns();
+    if (dragNd === selectedNd) {
+      document.getElementById('y-val').textContent = dragNd.grp.position.y.toFixed(1);
+    }
+    return;
+  }
+  if (orbiting) {
+    var dx = (e.clientX - orb.x) * 0.006;
+    var dy = (e.clientY - orb.y) * 0.006;
+    sTheta = orb.theta - dx;
+    sPhi   = Math.max(0.12, Math.min(Math.PI - 0.12, orb.phi + dy));
+    syncCam();
+    return;
+  }
+  if (panning) {
+    var pdx = e.clientX - panStart.x;
+    var pdy = e.clientY - panStart.y;
+    panStart.x = e.clientX;
+    panStart.y = e.clientY;
+    // Right vector = cross(cameraDir, worldUp)
+    var cdir = new THREE.Vector3().subVectors(panTarget, camera.position).normalize();
+    _panRight.crossVectors(cdir, _panUp).normalize();
+    var sens = sRadius * 0.0015;
+    panTarget.addScaledVector(_panRight, -pdx * sens);
+    panTarget.y += pdy * sens;
+    syncCam();
+  }
+});
+
+cvs.addEventListener('mouseup', function(e) {
+  if (dragNd && !dragged) {
+    selectNode(dragNd);
+  }
+  dragNd = null; dragged = false; orbiting = false; panning = false;
+});
+
+cvs.addEventListener('wheel', function(e) {
+  sRadius = Math.max(6, Math.min(500, sRadius + e.deltaY * 0.12));
+  syncCam();
+}, { passive: true });
+
+cvs.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+/* ---- PANEL CONTROLS ---- */
+document.getElementById('btn-yup').addEventListener('click', function() {
+  if (!selectedNd) return;
+  selectedNd.grp.position.y += 1;
+  refreshAllConns();
+  document.getElementById('y-val').textContent = selectedNd.grp.position.y.toFixed(1);
+});
+
+document.getElementById('btn-ydn').addEventListener('click', function() {
+  if (!selectedNd) return;
+  selectedNd.grp.position.y -= 1;
+  refreshAllConns();
+  document.getElementById('y-val').textContent = selectedNd.grp.position.y.toFixed(1);
+});
+
+document.getElementById('btn-child').addEventListener('click', function() {
+  var inp = document.getElementById('child-input');
+  var name = inp.value.trim().toUpperCase();
+  if (!name || !selectedNd) return;
+  var px = selectedNd.grp.position.x + (Math.random() - 0.5) * 7;
+  var py = selectedNd.grp.position.y + 2.5;
+  var pz = selectedNd.grp.position.z + (Math.random() - 0.5) * 7;
+  var nd = spawnNode(name, nextHex(), px, py, pz, selectedNd, true);
+  selectNode(nd);
+  inp.value = '';
+});
+
+document.getElementById('child-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-child').click();
+});
+
+document.getElementById('btn-connect').addEventListener('click', function() {
+  connMode = !connMode;
+  if (!connMode && connFirst) {
+    connFirst.label.style.textDecoration = '';
+    connFirst = null;
+  }
+  this.classList.toggle('active', connMode);
+  this.textContent = connMode ? '× CANCEL CONNECT' : '→ CONNECT';
+});
+
+document.getElementById('btn-free').addEventListener('click', function() {
+  var inp = document.getElementById('free-input');
+  var name = inp.value.trim().toUpperCase();
+  if (!name) return;
+  var x = (Math.random() - 0.5) * 22;
+  var y = (Math.random() - 0.5) * 6;
+  var z = (Math.random() - 0.5) * 22;
+  var nd = spawnNode(name, nextHex(), x, y, z, null, true);
+  selectNode(nd);
+  inp.value = '';
+});
+
+document.getElementById('free-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-free').click();
+});
+
+document.getElementById('btn-remove').addEventListener('click', function() {
+  var nd = selectedNd;
+  if (!nd) return;
+  for (var i = connList.length - 1; i >= 0; i--) {
+    var c = connList[i];
+    if (c.na === nd || c.nb === nd) {
+      scene.remove(c.line);
+      c.line.geometry.dispose();
+      c.line.material.dispose();
+      connList.splice(i, 1);
+    }
+  }
+  if (nd.label) nd.label.remove();
+  scene.remove(nd.grp);
+  var pos = allNodes.indexOf(nd);
+  if (pos !== -1) allNodes.splice(pos, 1);
+  selectNode(null);
+});
+
+/* ---- RESIZE ---- */
+window.addEventListener('resize', function() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+});
+
+/* ---- RENDER LOOP ---- */
+function animate() {
+  requestAnimationFrame(animate);
+  syncLabels();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

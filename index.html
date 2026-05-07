@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>J.SALIBA — Research Mind Map</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { background: #000; overflow: hidden; font-family: 'Arial Black', Arial, sans-serif; }
+#c { display: block; }
+
+#hints {
+  position: fixed; top: 74px; left: 22px;
+  color: #333; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; line-height: 2;
+  pointer-events: none; text-transform: uppercase;
+  font-family: Arial, sans-serif; z-index: 5;
+}
+
+/* Floating bottom-right map panel */
+#panel {
+  position: fixed;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 295px;
+  max-height: calc(100vh - 52px - 84px);
+  background: #141414; border: 1px solid #252525;
+  border-radius: 4px;
+  display: flex; flex-direction: column;
+  z-index: 190; overflow: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s;
+  will-change: opacity;
+}
+#panel.closed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#panel-tab {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  height: 36px; padding: 0 16px;
+  background: #c00; border: none; cursor: pointer;
+  color: #fff; font-size: 9px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  font-family: Arial, sans-serif;
+  writing-mode: horizontal-tb;
+  border-radius: 3px;
+  z-index: 191;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+#panel-tab:hover { background: #e00; }
+#panel-header { background: #c00; padding: 18px 20px 15px; flex-shrink: 0; }
+#panel-title { font-size: 19px; font-weight: 900; color: #fff; letter-spacing: 2.5px; text-transform: uppercase; font-family: 'Arial Black', Arial, sans-serif; }
+#panel-sub { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.75); letter-spacing: 2px; margin-top: 4px; text-transform: uppercase; font-family: Arial, sans-serif; }
+#panel-body { flex: 1; overflow-y: auto; }
+#sel-info { padding: 13px 20px; color: #666; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid #1e1e1e; font-family: Arial, sans-serif; }
+.psec { padding: 14px 20px; border-bottom: 1px solid #1e1e1e; }
+.plabel { font-size: 8.5px; font-weight: 700; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; font-family: Arial, sans-serif; }
+.yrow { display: flex; align-items: center; gap: 6px; }
+.ibtn { background: #1e1e1e; border: 1px solid #2e2e2e; color: #888; width: 36px; height: 36px; border-radius: 3px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.ibtn:hover { background: #2a2a2a; color: #fff; }
+#y-val { color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px; margin-left: 4px; }
+.irow { display: flex; gap: 6px; }
+.pinput { flex: 1; background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 3px; color: #bbb; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; padding: 0 10px; height: 36px; text-transform: uppercase; font-family: Arial, sans-serif; outline: none; }
+.pinput::placeholder { color: #383838; }
+.pinput:focus { border-color: #444; }
+.pinput.err { border-color: #c00 !important; color: #c00 !important; }
+@keyframes inp-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 80%{transform:translateX(-3px)} }
+.pinput.shake { animation: inp-shake 0.28s ease; }
+.input-err { font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-family: Arial,sans-serif; color: #c00; margin-top: 6px; min-height: 10px; opacity: 0; transition: opacity 0.15s; pointer-events: none; }
+.input-err.show { opacity: 1; }
+.abtn { background: #1e1e1e; border: 1px solid #2e2e2e; color: #888; width: 36px; height: 36px; font-size: 20px; cursor: pointer; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.abtn:hover { background: #2a2a2a; color: #fff; }
+#btn-connect { width: 100%; height: 38px; background: #c00; border: none; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; cursor: pointer; border-radius: 3px; text-transform: uppercase; font-family: Arial, sans-serif; transition: background 0.12s; }
+#btn-connect:hover { background: #e00; }
+#btn-connect.active { background: #660000; }
+#btn-disconnect { width: 100%; height: 38px; margin-top: 7px; background: transparent; border: 1px solid #c00; color: #c00; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; cursor: pointer; border-radius: 3px; text-transform: uppercase; font-family: Arial, sans-serif; transition: background 0.12s, color 0.12s; }
+#btn-disconnect:hover { background: rgba(204,0,0,0.15); }
+#btn-disconnect.active { background: #c00; color: #fff; }
+#btn-remove { width: 100%; height: 34px; margin-top: 8px; background: transparent; border: 1px solid #2e2e2e; color: #555; font-size: 9px; font-weight: 700; letter-spacing: 2px; cursor: pointer; border-radius: 3px; text-transform: uppercase; font-family: Arial, sans-serif; display: none; }
+#btn-remove:hover { border-color: #c00; color: #c00; }
+
+#legend {
+  position: fixed; bottom: 16px; left: 16px;
+  background: rgba(8,8,8,0.9); border: 1px solid #222;
+  padding: 10px 14px; z-index: 5; border-radius: 3px;
+}
+.ltitle { font-size: 8px; font-weight: 700; color: #444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; font-family: Arial, sans-serif; }
+.litem { display: flex; align-items: center; gap: 9px; font-size: 8.5px; color: #555; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; font-family: Arial, sans-serif; font-weight: 700; }
+.lline { width: 22px; height: 1px; background: #777; display: block; }
+
+@media (max-width: 767px) {
+  #panel {
+    width: calc(100vw - 40px);
+    max-height: calc(55vh - env(safe-area-inset-bottom, 0px));
+    right: 20px;
+  }
+  #legend { display: none; }
+  #hints { display: none; }
+  .pinput { font-size: 16px; letter-spacing: 0; }
+  .ibtn, .abtn { width: 44px; height: 44px; font-size: 18px; }
+  #btn-connect, #btn-disconnect { height: 44px; font-size: 11px; }
+  #btn-remove { height: 40px; }
+}
+
+#labels { position: absolute; top: 0; left: 0; pointer-events: none; }
+.node-label {
+  position: absolute; pointer-events: none;
+  transform: translate(-50%, 0);
+  color: #fff; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px; text-align: center; text-transform: uppercase;
+  text-shadow: 0 1px 5px #000, 0 0 10px #000;
+  white-space: pre-line; line-height: 1.3; max-width: 80px;
+  font-family: Arial, sans-serif;
+}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div id="labels"></div>
+
+<nav id="nav" class="dark">
+  <a href="index.html" class="nav-logo">J<span class="dot">.</span>SALIBA</a>
+  <div class="nav-links">
+    <a href="work.html">Work</a>
+    <a href="about.html">About</a>
+    <a href="shop.html">Shop</a>
+    <a href="inquiry.html">Inquiry</a>
+  </div>
+  <button class="nav-burger" id="burger" aria-label="Menu">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<div id="nav-overlay">
+  <button id="nav-close">&#x2715; Close</button>
+  <a href="work.html">Work</a>
+  <a href="about.html">About</a>
+  <a href="shop.html">Shop</a>
+  <a href="inquiry.html">Inquiry</a>
+</div>
+
+<div id="hints">
+  <div>DRAG &rarr; ORBIT</div>
+  <div>SHIFT+DRAG &rarr; PAN</div>
+  <div>DRAG BRICK &rarr; MOVE X/Z</div>
+  <div>SHIFT+DRAG BRICK &rarr; MOVE Y</div>
+  <div>SCROLL &rarr; ZOOM</div>
+</div>
+
+<button id="panel-tab" aria-label="Toggle panel">MAP &#9650;</button>
+<div id="panel">
+  <div id="panel-header">
+    <div id="panel-title">RESEARCH MAP</div>
+    <div id="panel-sub">DRAG BRICKS &middot; DRAW CONNECTIONS</div>
+  </div>
+  <div id="panel-body">
+    <div id="sel-info">&larr; SELECT A NODE</div>
+    <div class="psec">
+      <div class="plabel">VERTICAL POSITION</div>
+      <div class="yrow">
+        <button class="ibtn" id="btn-ydn">&#9660;</button>
+        <button class="ibtn" id="btn-yup">&#9650;</button>
+        <span id="y-val">--</span>
+      </div>
+    </div>
+    <div class="psec">
+      <div class="plabel">ADD CHILD NODE</div>
+      <div class="irow">
+        <input class="pinput" id="child-input" placeholder="CHILD THOUGHT..." />
+        <button class="abtn" id="btn-child">+</button>
+      </div>
+      <div class="input-err" id="child-err"></div>
+    </div>
+    <div class="psec">
+      <div class="plabel">CROSS-CONNECT NODES</div>
+      <button id="btn-connect">&rarr; CONNECT</button>
+      <button id="btn-disconnect">&#x2715; DISCONNECT</button>
+    </div>
+    <div class="psec">
+      <div class="plabel">ADD FREE-FLOATING THOUGHT</div>
+      <div class="irow">
+        <input class="pinput" id="free-input" placeholder="YOUR THOUGHT..." />
+        <button class="abtn" id="btn-free">+</button>
+      </div>
+      <div class="input-err" id="free-err"></div>
+      <button id="btn-remove">&#x2715; REMOVE SELECTED NODE</button>
+    </div>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="ltitle">CONNECTION TYPES</div>
+  <div class="litem"><span class="lline"></span>SPOKE / CHILD</div>
+  <div class="litem"><span class="lline"></span>CROSS-CONNECT</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var PALETTE = [
+  0xe63946, 0xff6b35, 0xffd166, 0x06d6a0, 0x118ab2,
+  0x9b5de5, 0xf15bb5, 0x00bbf9, 0xfee440, 0x80b918
+];
+var MAIN_NODES = [
+  { name: 'IMMERSIVE\nSTORYTELLING',    hex: 0xe63946 },
+  { name: 'SYSTEMIC ART',               hex: 0xff6b35 },
+  { name: 'AI STORYTELLING',            hex: 0xffd166 },
+  { name: 'CULTURAL HERITAGE',          hex: 0x06d6a0 },
+  { name: 'XR',                         hex: 0x118ab2 },
+  { name: 'GAMIFICATION',               hex: 0x9b5de5 },
+  { name: 'SPATIAL AUDIO',              hex: 0xf15bb5 },
+  { name: 'EXPERIENCE DESIGN',          hex: 0x00bbf9 },
+  { name: 'DIGITISATION',               hex: 0xfee440 },
+  { name: 'INTERACTIVE\nINSTALLATIONS', hex: 0x80b918 }
+];
+
+var PANEL_W = 0;
+var panelOpen = false;
+
+function setPanelOpen(open) {
+  panelOpen = open;
+  document.getElementById('panel').classList.toggle('closed', !open);
+  document.getElementById('panel-tab').textContent = open ? 'MAP ▼' : 'MAP ▲';
+  document.body.classList.toggle('panel-open', open);
+}
+setPanelOpen(window.innerWidth >= 768);
+document.getElementById('panel-tab').addEventListener('click', function() { setPanelOpen(!panelOpen); });
+
+var W = window.innerWidth;
+var H = window.innerHeight;
+
+var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.setClearColor(0x000000, 1);
+
+var scene  = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(52, W / H, 0.1, 1000);
+
+var amb = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(amb);
+var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(20, 30, 20);
+sun.castShadow = true;
+scene.add(sun);
+var fill = new THREE.DirectionalLight(0x4466ff, 0.28);
+fill.position.set(-15, 8, -20);
+scene.add(fill);
+
+var sTheta    = 0.38;
+var sPhi      = 1.08;
+var sRadius   = 55;
+var panTarget = new THREE.Vector3(0, 0, 0);
+
+function syncCam() {
+  var sp = Math.sin(sPhi), cp = Math.cos(sPhi);
+  var st = Math.sin(sTheta), ct = Math.cos(sTheta);
+  camera.position.set(
+    panTarget.x + sRadius * sp * st,
+    panTarget.y + sRadius * cp,
+    panTarget.z + sRadius * sp * ct
+  );
+  camera.lookAt(panTarget);
+}
+syncCam();
+
+function makeBrick(hex, bw, bh, bd) {
+  var grp  = new THREE.Group();
+  var col  = new THREE.Color(hex);
+  var dark = col.clone().multiplyScalar(0.48);
+  var matTop  = new THREE.MeshLambertMaterial({ color: col });
+  var matDark = new THREE.MeshLambertMaterial({ color: dark });
+  var matEdge = new THREE.LineBasicMaterial({ color: 0x000000 });
+  var bodyGeo = new THREE.BoxGeometry(bw, bh, bd);
+  var body    = new THREE.Mesh(bodyGeo, matTop);
+  body.castShadow = true; body.receiveShadow = true;
+  grp.add(body);
+  grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(bodyGeo), matEdge));
+  var sR = 0.27, sH = 0.20;
+  var nX = Math.max(1, Math.round(bw / 1.1));
+  var nZ = Math.max(1, Math.round(bd / 1.1));
+  var sGeo = new THREE.CylinderGeometry(sR, sR, sH, 8);
+  for (var si = 0; si < nX; si++) {
+    for (var sk = 0; sk < nZ; sk++) {
+      var stud = new THREE.Mesh(sGeo, matTop);
+      stud.position.set(
+        -bw / 2 + (si + 0.5) * (bw / nX),
+        bh / 2 + sH / 2,
+        -bd / 2 + (sk + 0.5) * (bd / nZ)
+      );
+      grp.add(stud);
+    }
+  }
+  var strip = new THREE.Mesh(new THREE.BoxGeometry(bw, 0.16, bd), matDark);
+  strip.position.y = -bh / 2 + 0.08;
+  grp.add(strip);
+  return grp;
+}
+
+var allNodes   = [];
+var connList   = [];
+var palIdx     = 0;
+var nextNodeId = 0;
+var labelsDiv  = document.getElementById('labels');
+
+function nextHex() {
+  return PALETTE[(palIdx++) % PALETTE.length];
+}
+
+var CENTRE = { grp: { position: new THREE.Vector3(0, 0, 0) }, hex: null, name: 'centre', label: null };
+var selectedNd = null;
+
+function updatePanel() {
+  var selInfo   = document.getElementById('sel-info');
+  var yVal      = document.getElementById('y-val');
+  var btnRemove = document.getElementById('btn-remove');
+  if (selectedNd) {
+    selInfo.textContent = selectedNd.name.replace('\n', ' ');
+    yVal.textContent    = selectedNd.grp.position.y.toFixed(1);
+    btnRemove.style.display = 'block';
+  } else {
+    selInfo.textContent = '← SELECT A NODE';
+    yVal.textContent    = '--';
+    btnRemove.style.display = 'none';
+  }
+}
+
+function selectNode(nd) {
+  if (selectedNd && selectedNd.label) selectedNd.label.style.color = '#fff';
+  selectedNd = nd;
+  if (nd && nd.label) nd.label.style.color = '#ffff88';
+  updatePanel();
+}
+
+function spawnNode(name, hex, x, y, z, parentNd, doAnimate) {
+  var BW = 2.2, BH = 1.1, BD = 2.2;
+  var grp = makeBrick(hex, BW, BH, BD);
+  grp.position.set(x, y, z);
+  scene.add(grp);
+  var lbl = document.createElement('div');
+  lbl.className   = 'node-label';
+  lbl.textContent = name;
+  labelsDiv.appendChild(lbl);
+  var nd = { grp: grp, name: name, hex: hex, label: lbl, idx: allNodes.length, id: nextNodeId++, bw: BW, bh: BH, bd: BD };
+  allNodes.push(nd);
+  (function capture(ref) {
+    grp.traverse(function(obj) {
+      if (obj.isMesh || obj.isLine) obj.userData.nidx = ref.idx;
+    });
+  })(nd);
+  if (parentNd !== null && parentNd !== undefined) addConn(parentNd, nd);
+  if (doAnimate) {
+    grp.scale.set(0.01, 0.01, 0.01);
+    var t0 = performance.now();
+    (function pop() {
+      var p = Math.min(1, (performance.now() - t0) / 380);
+      var s = 1 - Math.pow(1 - p, 3);
+      grp.scale.set(s, s, s);
+      if (p < 1) requestAnimationFrame(pop);
+    })();
+  }
+  return nd;
+}
+
+function connColor(na, nb) {
+  if (na && na.hex) return na.hex;
+  if (nb && nb.hex) return nb.hex;
+  return 0xffffff;
+}
+
+function makeCurveGeo(pA, pB) {
+  var mid = pA.clone().lerp(pB, 0.5);
+  mid.y += 3.5;
+  return new THREE.BufferGeometry().setFromPoints(
+    new THREE.QuadraticBezierCurve3(pA, mid, pB).getPoints(32)
+  );
+}
+
+function makeConnLine(na, nb) {
+  return new THREE.Line(
+    makeCurveGeo(na.grp.position.clone(), nb.grp.position.clone()),
+    new THREE.LineBasicMaterial({ color: new THREE.Color(connColor(na, nb)), transparent: true, opacity: 0.88 })
+  );
+}
+
+function addConn(na, nb) {
+  var ln = makeConnLine(na, nb);
+  scene.add(ln);
+  connList.push({ na: na, nb: nb, line: ln });
+}
+
+function refreshConn(c) {
+  c.line.geometry.dispose();
+  c.line.geometry = makeCurveGeo(c.na.grp.position.clone(), c.nb.grp.position.clone());
+}
+
+function refreshAllConns() {
+  for (var i = 0; i < connList.length; i++) refreshConn(connList[i]);
+}
+
+function initNodes() {
+  var count = MAIN_NODES.length, radius = 22;
+  for (var i = 0; i < count; i++) {
+    var angle = (i / count) * Math.PI * 2;
+    spawnNode(MAIN_NODES[i].name, MAIN_NODES[i].hex,
+      radius * Math.cos(angle),
+      (Math.random() - 0.5) * 4,
+      radius * Math.sin(angle),
+      CENTRE, false);
+  }
+}
+
+function saveState() {
+  var nodes = [];
+  for (var i = 0; i < allNodes.length; i++) {
+    var nd = allNodes[i];
+    if (!nd) continue;
+    nodes.push({ id: nd.id, name: nd.name, hex: nd.hex,
+      x: nd.grp.position.x, y: nd.grp.position.y, z: nd.grp.position.z });
+  }
+  var conns = [];
+  for (var j = 0; j < connList.length; j++) {
+    var c = connList[j];
+    conns.push({ naId: c.na === CENTRE ? 'centre' : c.na.id,
+                 nbId: c.nb === CENTRE ? 'centre' : c.nb.id });
+  }
+  try {
+    localStorage.setItem('mindmap_v1', JSON.stringify(
+      { nextId: nextNodeId, palIdx: palIdx, nodes: nodes, conns: conns }
+    ));
+  } catch(e) {}
+}
+
+function loadState() {
+  var raw = null;
+  try { raw = localStorage.getItem('mindmap_v1'); } catch(e) {}
+  if (!raw) { initNodes(); saveState(); return; }
+  var data = null;
+  try { data = JSON.parse(raw); } catch(e) { initNodes(); saveState(); return; }
+  palIdx = data.palIdx || 0;
+  var savedNextId = data.nextId || 0;
+  var idMap = {};
+  for (var i = 0; i < data.nodes.length; i++) {
+    var n = data.nodes[i];
+    var nd = spawnNode(n.name, n.hex, n.x, n.y, n.z, null, false);
+    nd.id = n.id;
+    idMap[n.id] = nd;
+  }
+  nextNodeId = savedNextId;
+  for (var j = 0; j < data.conns.length; j++) {
+    var c = data.conns[j];
+    var na = c.naId === 'centre' ? CENTRE : idMap[c.naId];
+    var nb = c.nbId === 'centre' ? CENTRE : idMap[c.nbId];
+    if (na && nb) addConn(na, nb);
+  }
+}
+loadState();
+
+var _v    = new THREE.Vector3();
+var _vBot = new THREE.Vector3();
+
+function syncLabels() {
+  for (var i = 0; i < allNodes.length; i++) {
+    var nd = allNodes[i];
+    if (!nd || !nd.label) continue;
+    _v.copy(nd.grp.position);
+    _v.project(camera);
+    if (_v.z >= 1) { nd.label.style.display = 'none'; continue; }
+    var sx = (_v.x * 0.5 + 0.5) * W;
+    if (sx > W - PANEL_W - 10) { nd.label.style.display = 'none'; continue; }
+    _vBot.copy(nd.grp.position);
+    _vBot.y -= nd.bh / 2 + 0.3;
+    _vBot.project(camera);
+    nd.label.style.display = 'block';
+    nd.label.style.left = ((_vBot.x * 0.5 + 0.5) * W) + 'px';
+    nd.label.style.top  = ((_vBot.y * -0.5 + 0.5) * H + 4) + 'px';
+  }
+}
+
+var rc   = new THREE.Raycaster();
+var mNDC = new THREE.Vector2();
+
+function setNDC(e) {
+  var r  = renderer.domElement.getBoundingClientRect();
+  mNDC.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
+  mNDC.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
+}
+
+function pickNode(e) {
+  if (e.clientX > W - PANEL_W) return null;
+  setNDC(e);
+  rc.setFromCamera(mNDC, camera);
+  var meshes = [];
+  for (var i = 0; i < allNodes.length; i++) {
+    if (!allNodes[i]) continue;
+    allNodes[i].grp.traverse(function(o) { if (o.isMesh) meshes.push(o); });
+  }
+  var hits = rc.intersectObjects(meshes);
+  if (!hits.length) return null;
+  var nidx = hits[0].object.userData.nidx;
+  if (nidx === undefined || nidx === null) return null;
+  return allNodes[nidx] || null;
+}
+
+var dragNd          = null;
+var dragPlaneH      = new THREE.Plane();
+var plHit           = new THREE.Vector3();
+var dragOff         = new THREE.Vector3();
+var dragVertical    = false;
+var dragStartMouseY = 0;
+var dragStartWorldY = 0;
+var dragged         = false;
+var orbiting        = false;
+var orb = { x: 0, y: 0, theta: 0, phi: 0 };
+var panning         = false;
+var panStart        = { x: 0, y: 0 };
+var _panRight       = new THREE.Vector3();
+var _panUp          = new THREE.Vector3(0, 1, 0);
+var connMode     = false;
+var connFirst    = null;
+var disconnMode  = false;
+var disconnFirst = null;
+
+var cvs = document.getElementById('c');
+
+cvs.addEventListener('mousedown', function(e) {
+  if (e.clientX > W - PANEL_W || e.button !== 0) return;
+  if (disconnMode) {
+    var hit = pickNode(e);
+    if (hit) {
+      if (!disconnFirst) {
+        disconnFirst = hit;
+        hit.label.style.color = '#ff6666';
+      } else {
+        for (var di = connList.length - 1; di >= 0; di--) {
+          var dc = connList[di];
+          if ((dc.na === disconnFirst && dc.nb === hit) || (dc.na === hit && dc.nb === disconnFirst)) {
+            scene.remove(dc.line); connList.splice(di, 1); saveState(); break;
+          }
+        }
+        disconnFirst.label.style.color = disconnFirst === selectedNd ? '#ffff88' : '#fff';
+        disconnFirst = null;
+        document.getElementById('btn-disconnect').classList.remove('active');
+        document.getElementById('btn-disconnect').textContent = '✕ DISCONNECT';
+        disconnMode = false;
+      }
+    }
+    return;
+  }
+  if (connMode) {
+    var hit = pickNode(e);
+    if (hit) {
+      if (!connFirst) {
+        connFirst = hit;
+        hit.label.style.textDecoration = 'underline';
+      } else {
+        addConn(connFirst, hit); saveState();
+        connFirst.label.style.textDecoration = '';
+        connFirst = null;
+        document.getElementById('btn-connect').classList.remove('active');
+        document.getElementById('btn-connect').textContent = '→ CONNECT';
+        connMode = false;
+      }
+    }
+    return;
+  }
+  var hit = pickNode(e);
+  if (hit) {
+    dragNd = hit; dragged = false;
+    dragVertical = e.shiftKey;
+    dragStartMouseY = e.clientY;
+    dragStartWorldY = hit.grp.position.y;
+    if (!dragVertical) {
+      setNDC(e); rc.setFromCamera(mNDC, camera);
+      dragPlaneH.set(new THREE.Vector3(0, 1, 0), -hit.grp.position.y);
+      dragOff.copy(hit.grp.position);
+      if (rc.ray.intersectPlane(dragPlaneH, plHit)) dragOff.sub(plHit);
+      else dragOff.set(0, 0, 0);
+    }
+    return;
+  }
+  if (e.shiftKey) { panning = true; panStart.x = e.clientX; panStart.y = e.clientY; return; }
+  selectNode(null);
+  orbiting = true; orb.x = e.clientX; orb.y = e.clientY; orb.theta = sTheta; orb.phi = sPhi;
+});
+
+cvs.addEventListener('mousemove', function(e) {
+  if (dragNd) {
+    dragged = true;
+    if (dragVertical) {
+      dragNd.grp.position.y = dragStartWorldY + ((dragStartMouseY - e.clientY) / H) * sRadius * 1.2;
+    } else {
+      setNDC(e); rc.setFromCamera(mNDC, camera);
+      if (rc.ray.intersectPlane(dragPlaneH, plHit)) {
+        dragNd.grp.position.x = plHit.x + dragOff.x;
+        dragNd.grp.position.z = plHit.z + dragOff.z;
+      }
+    }
+    refreshAllConns();
+    if (dragNd === selectedNd)
+      document.getElementById('y-val').textContent = dragNd.grp.position.y.toFixed(1);
+    return;
+  }
+  if (orbiting) {
+    sTheta = orb.theta - (e.clientX - orb.x) * 0.006;
+    sPhi   = Math.max(0.12, Math.min(Math.PI - 0.12, orb.phi + (e.clientY - orb.y) * 0.006));
+    syncCam(); return;
+  }
+  if (panning) {
+    var pdx = e.clientX - panStart.x, pdy = e.clientY - panStart.y;
+    panStart.x = e.clientX; panStart.y = e.clientY;
+    var cdir = new THREE.Vector3().subVectors(panTarget, camera.position).normalize();
+    _panRight.crossVectors(cdir, _panUp).normalize();
+    var sens = sRadius * 0.0015;
+    panTarget.addScaledVector(_panRight, -pdx * sens);
+    panTarget.y += pdy * sens;
+    syncCam();
+  }
+});
+
+cvs.addEventListener('mouseup', function(e) {
+  if (dragNd && !dragged) selectNode(dragNd);
+  if (dragNd && dragged) saveState();
+  dragNd = null; dragged = false; orbiting = false; panning = false;
+});
+
+cvs.addEventListener('wheel', function(e) {
+  sRadius = Math.max(6, Math.min(500, sRadius + e.deltaY * 0.12));
+  syncCam();
+}, { passive: true });
+
+cvs.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+cvs.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  var t = e.touches[0];
+  cvs.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: t.clientX, clientY: t.clientY, button: 0 }));
+}, { passive: false });
+cvs.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  var t = e.touches[0];
+  cvs.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+cvs.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  var t = e.changedTouches[0];
+  cvs.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+
+document.getElementById('btn-yup').addEventListener('click', function() {
+  if (!selectedNd) return;
+  selectedNd.grp.position.y += 1;
+  refreshAllConns(); saveState();
+  document.getElementById('y-val').textContent = selectedNd.grp.position.y.toFixed(1);
+});
+document.getElementById('btn-ydn').addEventListener('click', function() {
+  if (!selectedNd) return;
+  selectedNd.grp.position.y -= 1;
+  refreshAllConns(); saveState();
+  document.getElementById('y-val').textContent = selectedNd.grp.position.y.toFixed(1);
+});
+/* ── INPUT VALIDATION ── */
+var BAD_WORDS = [
+  'fuck','fucking','fucked','fucker','fucks',
+  'shit','shitting','shitter','shitty',
+  'cunt','cunts',
+  'bitch','bitches',
+  'dick','dicks',
+  'cock','cocks',
+  'pussy','pussies',
+  'ass','asses','asshole','assholes','jackass',
+  'bastard','bastards',
+  'whore','whores',
+  'slut','sluts',
+  'piss','pissed','pisser',
+  'twat','twats',
+  'wank','wanker','wankers',
+  'arse','arsehole',
+  'bollocks',
+  'nigger','niggers','nigga',
+  'faggot','faggots',
+  'puttana','puttane',
+  'cazzo','cazzi',
+  'vaffanculo','fanculo',
+  'merda','stronzo',
+  'figa','fica'
+];
+
+function hasBadWord(s) {
+  var lower = ' ' + s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ') + ' ';
+  for (var i = 0; i < BAD_WORDS.length; i++) {
+    if (lower.indexOf(' ' + BAD_WORDS[i] + ' ') !== -1) return true;
+  }
+  return false;
+}
+
+function isGibberish(s) {
+  var clean = s.replace(/\s/g, '').toLowerCase();
+  if (!clean) return false;
+  /* same char 5+ in a row */
+  if (/(.)\1{4,}/.test(clean)) return true;
+  /* skip short strings — could be legit acronyms */
+  if (clean.length < 5) return false;
+  /* very low vowel ratio for longer strings */
+  var vowels = (clean.match(/[aeiou]/g) || []).length;
+  if (clean.length > 6 && vowels / clean.length < 0.06) return true;
+  /* 8+ consecutive consonants */
+  if (/[bcdfghjklmnpqrstvwxyz]{8,}/.test(clean)) return true;
+  /* keyboard row runs */
+  if (/qwert|werty|asdfg|sdfgh|zxcvb|xcvbn/.test(clean)) return true;
+  /* repeated short pattern: "abcabc", "asdfasdf" */
+  if (/^(.{2,5})\1{2,}$/.test(clean)) return true;
+  return false;
+}
+
+function validateInput(raw) {
+  var s = raw.trim();
+  if (!s) return 'ENTER SOME TEXT';
+  if (s.length > 40) return 'MAX 40 CHARACTERS';
+  if (hasBadWord(s)) return 'INAPPROPRIATE CONTENT';
+  if (isGibberish(s)) return 'PLEASE ENTER A REAL WORD';
+  return null;
+}
+
+function showInputErr(inputId, errId, msg) {
+  var inp = document.getElementById(inputId);
+  var err = document.getElementById(errId);
+  inp.classList.add('err');
+  inp.classList.remove('shake');
+  void inp.offsetWidth;
+  inp.classList.add('shake');
+  err.textContent = msg;
+  err.classList.add('show');
+  clearTimeout(inp._errTimer);
+  inp._errTimer = setTimeout(function() {
+    inp.classList.remove('err', 'shake');
+    err.classList.remove('show');
+  }, 2800);
+}
+
+function clearInputErr(inputId, errId) {
+  document.getElementById(inputId).classList.remove('err', 'shake');
+  document.getElementById(errId).classList.remove('show');
+}
+
+document.getElementById('btn-child').addEventListener('click', function() {
+  var inp = document.getElementById('child-input');
+  var raw = inp.value.trim();
+  var err = validateInput(raw);
+  if (err) { showInputErr('child-input', 'child-err', err); return; }
+  if (!selectedNd) return;
+  clearInputErr('child-input', 'child-err');
+  var name = raw.toUpperCase();
+  var nd = spawnNode(name, nextHex(),
+    selectedNd.grp.position.x + (Math.random() - 0.5) * 7,
+    selectedNd.grp.position.y + 2.5,
+    selectedNd.grp.position.z + (Math.random() - 0.5) * 7,
+    selectedNd, true);
+  selectNode(nd); saveState();
+  inp.value = '';
+});
+document.getElementById('child-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-child').click();
+});
+document.getElementById('btn-connect').addEventListener('click', function() {
+  connMode = !connMode;
+  if (!connMode && connFirst) { connFirst.label.style.textDecoration = ''; connFirst = null; }
+  this.classList.toggle('active', connMode);
+  this.textContent = connMode ? '× CANCEL CONNECT' : '→ CONNECT';
+  if (connMode && disconnMode) {
+    disconnMode = false;
+    if (disconnFirst) { disconnFirst.label.style.color = disconnFirst === selectedNd ? '#ffff88' : '#fff'; disconnFirst = null; }
+    document.getElementById('btn-disconnect').classList.remove('active');
+    document.getElementById('btn-disconnect').textContent = '✕ DISCONNECT';
+  }
+});
+document.getElementById('btn-disconnect').addEventListener('click', function() {
+  disconnMode = !disconnMode;
+  if (!disconnMode && disconnFirst) { disconnFirst.label.style.color = disconnFirst === selectedNd ? '#ffff88' : '#fff'; disconnFirst = null; }
+  this.classList.toggle('active', disconnMode);
+  this.textContent = disconnMode ? '× CANCEL' : '✕ DISCONNECT';
+  if (disconnMode && connMode) {
+    connMode = false;
+    if (connFirst) { connFirst.label.style.textDecoration = ''; connFirst = null; }
+    document.getElementById('btn-connect').classList.remove('active');
+    document.getElementById('btn-connect').textContent = '→ CONNECT';
+  }
+});
+document.getElementById('btn-free').addEventListener('click', function() {
+  var inp = document.getElementById('free-input');
+  var raw = inp.value.trim();
+  var err = validateInput(raw);
+  if (err) { showInputErr('free-input', 'free-err', err); return; }
+  clearInputErr('free-input', 'free-err');
+  var name = raw.toUpperCase();
+  var nd = spawnNode(name, nextHex(),
+    (Math.random() - 0.5) * 40, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 40,
+    null, true);
+  selectNode(nd); saveState();
+  inp.value = '';
+});
+document.getElementById('free-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-free').click();
+});
+document.getElementById('btn-remove').addEventListener('click', function() {
+  if (!selectedNd) return;
+  var nd = selectedNd;
+  for (var i = connList.length - 1; i >= 0; i--) {
+    if (connList[i].na === nd || connList[i].nb === nd) {
+      scene.remove(connList[i].line); connList.splice(i, 1);
+    }
+  }
+  if (connFirst === nd) { connFirst = null; connMode = false; document.getElementById('btn-connect').classList.remove('active'); document.getElementById('btn-connect').textContent = '→ CONNECT'; }
+  if (disconnFirst === nd) { disconnFirst = null; disconnMode = false; document.getElementById('btn-disconnect').classList.remove('active'); document.getElementById('btn-disconnect').textContent = '✕ DISCONNECT'; }
+  if (nd.label) nd.label.remove();
+  scene.remove(nd.grp);
+  allNodes[nd.idx] = null;
+  selectNode(null); saveState();
+});
+
+window.addEventListener('resize', function() {
+  W = window.innerWidth; H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+  syncCam();
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  syncLabels();
+  renderer.render(scene, camera);
+}
+animate();
+
+document.getElementById('burger').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.add('open');
+});
+document.getElementById('nav-close').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.remove('open');
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('nav-overlay').classList.remove('open');
+});
+</script>
+</body>
+</html>

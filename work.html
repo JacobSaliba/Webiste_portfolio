@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work — J.SALIBA</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+
+<nav id="nav" class="light">
+  <a href="index.html" class="nav-logo">J<span class="dot">.</span>SALIBA</a>
+  <div class="nav-links">
+    <a href="work.html" class="active">Work</a>
+    <a href="about.html">About</a>
+    <a href="shop.html">Shop</a>
+    <a href="inquiry.html">Inquiry</a>
+  </div>
+  <button class="nav-burger" id="burger" aria-label="Menu">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<div id="nav-overlay">
+  <button id="nav-close">&#x2715; Close</button>
+  <a href="work.html">Work</a>
+  <a href="about.html">About</a>
+  <a href="shop.html">Shop</a>
+  <a href="inquiry.html">Inquiry</a>
+</div>
+
+<!-- HERO BAND -->
+<div class="hero-band">
+  <h1 class="s-title xl"><span class="hw-wor">WOR</span><span class="hw-fall">K</span><span class="r">.</span></h1>
+  <p class="hero-sub">
+    SELECTED PROJECTS<br>
+    2019 — 2025
+  </p>
+</div>
+
+<!-- VIEW TOGGLE + SYNTH CONTROLS -->
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px var(--margin)">
+  <div class="synth-controls">
+    <div class="synth-slider">
+      <label class="synth-label" for="ctrl-sustain">Sustain</label>
+      <input class="synth-range" type="range" id="ctrl-sustain" min="0" max="100" value="35">
+    </div>
+    <div class="synth-slider">
+      <label class="synth-label" for="ctrl-delay">Delay</label>
+      <input class="synth-range" type="range" id="ctrl-delay" min="0" max="100" value="0">
+    </div>
+    <div class="synth-slider">
+      <label class="synth-label" for="ctrl-note">Note</label>
+      <input class="synth-range" type="range" id="ctrl-note" min="-12" max="12" value="0">
+    </div>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btn-grid">Grid</button>
+    <button class="view-btn" id="btn-list">List</button>
+  </div>
+</div>
+<div class="hairline"></div>
+
+<!-- WORK GRID -->
+<div id="work-container"></div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="f-logo">J<span class="dot">.</span>SALIBA</span>
+  <div class="f-links">
+    <a href="work.html">Work</a>
+    <a href="about.html">About</a>
+    <a href="shop.html">Shop</a>
+    <a href="inquiry.html">Inquiry</a>
+    <a href="index.html">Mind Map</a>
+  </div>
+  <span class="f-copy">&copy; 2025 Jacob Saliba</span>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────
+   WORKS DATA
+   To add a new project: add a new object to this array.
+   To update: edit the relevant object.
+   Categories (cat): heritage | vr | interactive | sound |
+                     performance | digital-art | teaching | 3d
+   img: path relative to this file, e.g. "media/ta-kandja/thumb.jpg"
+        Leave "" to show a colour placeholder.
+───────────────────────────────────────────────────────────────── */
+var WORKS = [
+  {
+    slug:  'echoes-of-the-unseen',
+    title: 'Echoes of the Unseen',
+    year:  '2025',
+    cat:   'vr',
+    color: '#118ab2',
+    img:   '',
+    desc:  'An XR experience exploring spatial memory through layered sound and volumetric imagery.'
+  },
+  {
+    slug:  'archive-in-motion',
+    title: 'Archive in Motion',
+    year:  '2024',
+    cat:   'heritage',
+    color: '#06d6a0',
+    img:   '',
+    desc:  'Real-time digitisation of intangible cultural heritage, converting oral traditions into navigable 3D archives.'
+  },
+  {
+    slug:  'system-error',
+    title: 'System Error',
+    year:  '2024',
+    cat:   'interactive',
+    color: '#e63946',
+    img:   '',
+    desc:  'An autonomous installation that responds to viewer density, generating systemic visual feedback loops.'
+  },
+  {
+    slug:  'synthetic-narratives',
+    title: 'Synthetic Narratives',
+    year:  '2023',
+    cat:   'digital-art',
+    color: '#ffd166',
+    img:   '',
+    desc:  'AI-generated storytelling where the audience co-authors branching narrative structures in real time.'
+  },
+  {
+    slug:  'resonant-field',
+    title: 'Resonant Field',
+    year:  '2023',
+    cat:   'performance',
+    color: '#f15bb5',
+    img:   '',
+    desc:  'Live performance combining spatial audio arrays, motion capture, and generative visuals.'
+  },
+  {
+    slug:  'layers',
+    title: 'Layers',
+    year:  '2023',
+    cat:   'interactive',
+    color: '#9b5de5',
+    img:   '',
+    desc:  'A multi-channel installation examining how accumulated data shapes collective memory and identity.'
+  },
+  {
+    slug:  'play-pause',
+    title: 'Play / Pause',
+    year:  '2022',
+    cat:   'vr',
+    color: '#00bbf9',
+    img:   '',
+    desc:  'Gamified walkthrough of a historic building using mixed-reality overlays and location-based triggers.'
+  },
+  {
+    slug:  'folk-plus-plus',
+    title: 'Folk++',
+    year:  '2022',
+    cat:   'heritage',
+    color: '#80b918',
+    img:   '',
+    desc:  'Algorithmically remixed folk music traditions, cross-referencing pattern libraries across five cultures.'
+  }
+];
+
+/* ── STATE ── */
+var activeView = 'grid';
+var container  = document.getElementById('work-container');
+
+/* ── VIEW TOGGLE ── */
+document.getElementById('btn-grid').addEventListener('click', function() {
+  activeView = 'grid';
+  this.classList.add('active');
+  document.getElementById('btn-list').classList.remove('active');
+  render();
+});
+document.getElementById('btn-list').addEventListener('click', function() {
+  activeView = 'list';
+  this.classList.add('active');
+  document.getElementById('btn-grid').classList.remove('active');
+  render();
+});
+
+/* ── RENDER ── */
+function filtered() {
+  return WORKS;
+}
+
+function render() {
+  container.innerHTML = '';
+  var list = filtered();
+
+  if (!list.length) {
+    container.innerHTML = '<p style="padding:60px var(--margin);font-family:var(--f-mono);font-size:11px;color:var(--color-mid);letter-spacing:2px;text-transform:uppercase;">No works in this category yet.</p>';
+    return;
+  }
+
+  if (activeView === 'grid') {
+    var grid = document.createElement('div');
+    grid.className = 'work-grid';
+    list.forEach(function(w) {
+      var card = document.createElement('div');
+      card.className = 'work-card';
+
+      var thumb = document.createElement('div');
+      thumb.className = 'wc-thumb';
+      if (w.img) {
+        thumb.innerHTML = '<img src="' + w.img + '" alt="' + w.title + '">';
+      } else {
+        thumb.innerHTML = '<div class="wc-placeholder" style="background:' + w.color + '"><span class="wc-placeholder-label">' + w.title + '</span></div>';
+      }
+
+      var catLabel = w.cat.replace('-', ' ').toUpperCase();
+      var meta = document.createElement('div');
+      meta.className = 'wc-meta';
+      meta.innerHTML =
+        '<div class="wc-row">' +
+          '<span class="wc-cat">' + catLabel + '</span>' +
+          '<span class="wc-year">' + w.year + '</span>' +
+        '</div>' +
+        '<div class="wc-title">' + w.title + '</div>';
+
+      card.appendChild(thumb);
+      card.appendChild(meta);
+
+      /* Navigate to project page if a file exists for this slug */
+      card.addEventListener('click', function() {
+        window.location.href = 'work/' + w.slug + '.html';
+      });
+
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  } else {
+    /* List view */
+    var hdr = document.createElement('div');
+    hdr.className = 'work-list-row';
+    hdr.style.cssText = 'opacity:0.4;cursor:default;font-family:var(--f-mono);font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.1em;';
+    hdr.innerHTML = '<span>Title</span><span>Category</span><span>Year</span><span></span>';
+    container.appendChild(hdr);
+    list.forEach(function(w) {
+      var row = document.createElement('div');
+      row.className = 'work-list-row';
+      var catLabel = w.cat.replace('-', ' ').toUpperCase();
+      row.innerHTML =
+        '<span class="wl-title">' + w.title + '</span>' +
+        '<span class="wl-cat">' + catLabel + '</span>' +
+        '<span class="wl-year">' + w.year + '</span>' +
+        '<span class="wl-arrow">&rarr;</span>';
+      row.addEventListener('click', function() {
+        window.location.href = 'work/' + w.slug + '.html';
+      });
+      container.appendChild(row);
+    });
+  }
+}
+
+/* ── MOBILE NAV ── */
+document.getElementById('burger').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.add('open');
+});
+document.getElementById('nav-close').addEventListener('click', function() {
+  document.getElementById('nav-overlay').classList.remove('open');
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('nav-overlay').classList.remove('open');
+});
+
+render();
+
+/* K physics — tree-fall with dot collision and hero-band bounding */
+(function () {
+  var kEl  = document.querySelector('.hw-fall');
+  var dEl  = document.querySelector('.hero-band .s-title .r');
+  var hero = document.querySelector('.hero-band');
+  if (!kEl || !dEl || !hero) return;
+
+  dEl.style.display = 'inline-block';  /* enable CSS transforms on inline span */
+
+  var kAng = 0, kVel = 0, kDone = false;
+  var dtx  = 0, dty  = 0, dvx   = 0, dvy = 0;
+  var dHit = false, dRest = false, dDone = false;
+  var dL0, dT0, dW, dH;
+
+  function overlaps(a, b) {
+    return a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
+  }
+
+  function tick() {
+    var hR = hero.getBoundingClientRect();
+
+    /* K rotation — angular acceleration like gravity */
+    if (!kDone) {
+      kVel += 0.13;
+      kAng += kVel;
+      if (kAng >= 90) { kAng = 90; kDone = true; }
+      kEl.style.transform = 'rotate(' + kAng + 'deg)';
+      if (!kDone && kEl.getBoundingClientRect().right >= hR.right - 4) kDone = true;
+    }
+
+    /* Collision — wait for K to visibly tilt (~10°) so impact has real velocity */
+    if (!dHit && kAng > 10) {
+      var kR = kEl.getBoundingClientRect();
+      var dR = dEl.getBoundingClientRect();
+      if (overlaps(kR, dR)) {
+        dHit = true;
+        dL0 = dR.left; dT0 = dR.top; dW = dR.width; dH = dR.height;
+        dvx  =  kVel * 8;
+        dvy  = -kVel * 12;
+        kVel *= 0.20;   /* K recoils, falls slower */
+        kDone = false;  /* K continues to fall */
+      }
+    }
+
+    /* Dot physics */
+    if (dHit && !dDone) {
+      if (!dRest) {
+        dvy += 0.28;      /* gravity */
+        dvx *= 0.993;     /* air resistance */
+        dtx += dvx;
+        dty += dvy;
+        if (dL0 + dtx + dW > hR.right)  { dtx = hR.right - dL0 - dW; dvx = -Math.abs(dvx) * 0.42; }
+        if (dL0 + dtx      < hR.left)   { dtx = hR.left  - dL0;      dvx =  Math.abs(dvx) * 0.42; }
+        if (dT0 + dty      < hR.top)    { dty = hR.top   - dT0;      dvy =  Math.abs(dvy) * 0.42; }
+        if (dT0 + dty + dH > hR.bottom) {
+          dty = hR.bottom - dT0 - dH;
+          if (Math.abs(dvy) < 1.5) { dRest = true; dvy = 0; }
+          else                      { dvy = -Math.abs(dvy) * 0.42; dvx *= 0.80; }
+        }
+      } else {
+        dvx *= 0.88;              /* floor friction */
+        dtx += dvx;
+        dty  = hR.bottom - dT0 - dH;
+        if (dL0 + dtx + dW > hR.right) { dtx = hR.right - dL0 - dW; dvx = -Math.abs(dvx) * 0.42; }
+        if (dL0 + dtx      < hR.left)  { dtx = hR.left  - dL0;      dvx =  Math.abs(dvx) * 0.42; }
+        if (Math.abs(dvx)  < 0.08)     { dvx = 0; dDone = true; }
+      }
+      dEl.style.transform = 'translate(' + dtx + 'px, ' + dty + 'px)';
+    }
+
+    if (!kDone || (dHit && !dDone)) requestAnimationFrame(tick);
+  }
+
+  kEl.addEventListener('mouseenter', function () {
+    requestAnimationFrame(tick);
+  }, { once: true });
+}());
+
+/* WORK → PLAY. : red cutting line then pop */
+(function () {
+  var worEl = document.querySelector('.hw-wor');
+  var kEl   = document.querySelector('.hw-fall');
+  if (!worEl || !kEl) return;
+
+
+  kEl.addEventListener('mouseenter', function () {
+    /* snapshot rects before physics transforms the K */
+    var wR    = worEl.getBoundingClientRect();
+    var kR    = kEl.getBoundingClientRect();
+    var lineW = Math.round(kR.right - wR.left);
+
+    /* build the cutting line */
+    var line = document.createElement('div');
+    line.style.cssText = [
+      'position:fixed',
+      'left:'   + Math.round(wR.left) + 'px',
+      'top:'    + Math.round(wR.top + wR.height * 0.52) + 'px',
+      'height:13px',
+      'width:0',
+      'background:var(--color-accent)',
+      'z-index:201',
+      'pointer-events:none',
+      'transform-origin:left center',
+    ].join(';');
+    document.body.appendChild(line);
+
+    /* sweep line left → right */
+    setTimeout(function () {
+      line.style.transition = 'width 0.55s cubic-bezier(0.77, 0, 0.18, 1)';
+      line.style.width      = lineW + 'px';
+
+      /* once line lands, strike out the text */
+      setTimeout(function () {
+        worEl.style.transition = 'opacity 0.3s ease';
+        worEl.style.opacity    = '0';
+        kEl.style.transition   = 'opacity 0.3s ease';
+        kEl.style.opacity      = '0';
+        line.style.transition  = 'opacity 0.3s ease 0.1s';
+        line.style.opacity     = '0';
+        var dotEl = document.querySelector('.hero-band .s-title .r');
+        if (dotEl) { dotEl.style.transition = 'opacity 0.3s ease'; dotEl.style.opacity = '0'; }
+
+        /* PLAY. pops in */
+        setTimeout(function () {
+          line.remove();
+          worEl.style.transition = 'none';
+          worEl.innerHTML        = 'PLAY<span style="color:var(--color-accent)">.</span>';
+          worEl.style.color      = 'var(--color-ink)';
+          worEl.style.opacity    = '0';
+          worEl.style.transform  = 'scale(0.86)';
+
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              worEl.style.transition = 'opacity 0.45s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              worEl.style.opacity    = '1';
+              worEl.style.transform  = 'scale(1)';
+            });
+          });
+        }, 380);
+      }, 600); /* wait for line sweep */
+    }, 300);   /* slight delay after K starts falling */
+  }, { once: true });
+}());
+</script>
+
+<!-- CARD AUDIO — glass bell synth -->
+<script>
+(function () {
+  var ACtx = window.AudioContext || window.webkitAudioContext;
+  if (!ACtx) return;
+
+  var ac        = null;
+  var comp      = null;
+  var delayNode = null;
+  var delayFb   = null;
+  var delayWet  = null;
+
+  /* Live values driven by sliders */
+  var pSustain  = 0.9;   /* decay time-constant, seconds (longer = longer ring) */
+  var pDelayMix = 0.0;   /* delay wet mix 0–0.65 */
+  var pNoteSemi = 0;     /* semitone transpose -12…+12 */
+
+  /* Chords in the 350–880 Hz sweet spot — bell register */
+  var CHORDS = [
+    [523.25, 659.25, 783.99],  /* C5  major */
+    [440.00, 523.25, 659.25],  /* A4  minor */
+    [587.33, 739.99, 880.00],  /* D5  major */
+    [392.00, 493.88, 587.33],  /* G4  major */
+    [349.23, 440.00, 523.25],  /* F4  major */
+    [493.88, 587.33, 739.99],  /* B4  minor */
+    [466.16, 587.33, 698.46],  /* Bb4 major */
+    [415.30, 523.25, 622.25],  /* Ab4 major */
+    [369.99, 466.16, 554.37],  /* F#4 minor */
+    [277.18, 349.23, 415.30],  /* C#4 minor */
+  ];
+
+  /* Inharmonic partial ratios that give glass its shimmer.
+     Real glass partials: fundamental, ~2.0×, ~3.4× */
+  var PARTIALS = [
+    { ratio: 1.000, vol: 0.20 },
+    { ratio: 2.000, vol: 0.09 },
+    { ratio: 3.400, vol: 0.04 },
+  ];
+
+  var currentCard = null;
+  var repeatId    = null;
+
+  function init() {
+    if (!ac) {
+      ac   = new ACtx();
+      comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14;
+      comp.knee.value      = 4;
+      comp.ratio.value     = 5;
+      comp.attack.value    = 0.002;
+      comp.release.value   = 0.2;
+      comp.connect(ac.destination);
+    }
+    if (ac.state === 'suspended') ac.resume();
+    if (!delayNode) {
+      delayNode = ac.createDelay(1.0);
+      delayNode.delayTime.value = 0.28;
+      delayFb = ac.createGain();
+      delayFb.gain.value = 0.40;
+      delayWet = ac.createGain();
+      delayWet.gain.value = pDelayMix;
+      delayNode.connect(delayFb);
+      delayFb.connect(delayNode);
+      delayNode.connect(delayWet);
+      delayWet.connect(comp);
+    }
+  }
+
+  function playChord(freqs) {
+    init();
+    var now = ac.currentTime;
+    var att = 0.004;               /* near-instant glass strike  */
+    var tc  = pSustain;            /* exponential ring-out constant */
+    var dur = att + tc * 7;        /* 7× tc is effectively silent */
+
+    var transpose = Math.pow(2, pNoteSemi / 12);
+    freqs = freqs.map(function (f) { return f * transpose; });
+
+    freqs.forEach(function (f) {
+      PARTIALS.forEach(function (p) {
+        var osc = ac.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = f * p.ratio;
+
+        var g = ac.createGain();
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(p.vol, now + att);
+        /* Natural exponential ring-out — the glass bell character */
+        g.gain.setTargetAtTime(0, now + att, tc);
+
+        osc.connect(g);
+        g.connect(comp);
+        if (delayNode) g.connect(delayNode);
+
+        osc.start(now);
+        osc.stop(now + dur);
+      });
+    });
+  }
+
+  function stopRepeat() {
+    if (repeatId) { clearInterval(repeatId); repeatId = null; }
+    currentCard = null;
+  }
+
+  var REPEAT_MS = 2000;
+
+  var container = document.getElementById('work-container');
+  if (!container) return;
+
+  container.addEventListener('mouseover', function (e) {
+    var card = e.target.closest && e.target.closest('.work-card');
+    if (!card || card === currentCard) return;
+    stopRepeat();
+    currentCard = card;
+    var idx   = Array.prototype.indexOf.call(document.querySelectorAll('.work-card'), card);
+    var freqs = CHORDS[idx % CHORDS.length];
+    playChord(freqs);
+    repeatId = setInterval(function () { playChord(freqs); }, REPEAT_MS);
+  });
+
+  container.addEventListener('mouseout', function (e) {
+    var card = e.target.closest && e.target.closest('.work-card');
+    if (!card || card !== currentCard) return;
+    if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+    stopRepeat();
+  });
+
+  /* ── Slider wiring ── */
+  var elSus   = document.getElementById('ctrl-sustain');
+  var elDelay = document.getElementById('ctrl-delay');
+  var elNote  = document.getElementById('ctrl-note');
+
+  if (elSus) elSus.addEventListener('input', function () {
+    /* 0–100 → time constant 0.2s (short tap) – 2.5s (long ring) */
+    pSustain = 0.2 + (this.value / 100) * 2.3;
+  });
+  if (elDelay) elDelay.addEventListener('input', function () {
+    pDelayMix = (this.value / 100) * 0.65;
+    if (delayWet) delayWet.gain.setTargetAtTime(pDelayMix, ac.currentTime, 0.05);
+  });
+  if (elNote) elNote.addEventListener('input', function () {
+    pNoteSemi = parseInt(this.value);
+  });
+})();
+</script>
+
+<!-- KEITH HARING FIGURE ON K -->
+<style>
+@keyframes kh-wave {
+  from { transform: rotate(-14deg); }
+  to   { transform: rotate(16deg); }
+}
+.kh-arm { transform-origin: 18px 20px; animation: kh-wave 0.65s ease-in-out infinite alternate; }
+.hw-wor { display: inline-block; }
+</style>
+<script>
+(function () {
+  var kEl = document.querySelector('.hw-fall');
+  if (!kEl) return;
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function ln(x1, y1, x2, y2, cls) {
+    var e = mk('line', { x1:x1, y1:y1, x2:x2, y2:y2,
+      stroke: '#0A0A0A', 'stroke-width': '3.5', 'stroke-linecap': 'round' });
+    if (cls) e.setAttribute('class', cls);
+    return e;
+  }
+
+  /* Build figure — feet at viewBox bottom so they sit flush on K's top */
+  var svg = mk('svg', { viewBox: '0 0 36 56', width: '36', height: '56' });
+  svg.style.overflow = 'visible';
+  svg.appendChild(mk('circle', { cx:'18', cy:'8',  r:'6',  fill:'#0A0A0A' }));
+  svg.appendChild(ln(18, 14, 18, 34));
+  svg.appendChild(ln(18, 20,  7, 28));
+  svg.appendChild(ln(18, 20, 31,  9, 'kh-arm'));
+  svg.appendChild(ln(18, 34,  9, 56));
+  svg.appendChild(ln(18, 34, 27, 56));
+
+  /* position:absolute so the figure scrolls with the page content */
+  var fig = document.createElement('span');
+  fig.style.cssText = 'position:absolute;pointer-events:none;display:inline-block;z-index:100;';
+  fig.appendChild(svg);
+  document.body.appendChild(fig);
+
+  var jumped = false;
+
+  function place() {
+    if (jumped) return;
+    var r  = kEl.getBoundingClientRect();
+    var fs = parseFloat(getComputedStyle(kEl).fontSize);
+
+    /* scale figure proportionally — baseline: fs=144 → 36×56 px */
+    var figH = Math.round(fs * 56 / 144);
+    var figW = Math.round(figH * 36 / 56);
+    svg.setAttribute('width',  figW);
+    svg.setAttribute('height', figH);
+
+    var adj = fs * 0.05;
+    fig.style.left = (r.left + window.scrollX + r.width / 2 - figW / 2 + fs * 30 / 144) + 'px';
+    fig.style.top  = (r.top  + window.scrollY - adj - figH * 36 / 56) + 'px';
+  }
+
+  requestAnimationFrame(place);
+  window.addEventListener('resize', place);
+  window.addEventListener('scroll', place);
+
+  /* Fall through the whole viewport — same hover as K physics */
+  kEl.addEventListener('mouseenter', function () {
+    jumped = true;
+    window.removeEventListener('resize', place);
+    window.removeEventListener('scroll', place);
+
+    /* freeze arm mid-wave */
+    var arm = fig.querySelector('.kh-arm');
+    if (arm) arm.style.animation = 'none';
+
+    /* capture current viewport position, then switch to fixed for the fall */
+    var vr = fig.getBoundingClientRect();
+    fig.style.position = 'fixed';
+    fig.style.left     = vr.left + 'px';
+    fig.style.top      = vr.top  + 'px';
+
+    var startL = vr.left, startT = vr.top;
+    var fx = 0, fy = 0, fvx = 2, fvy = 0.8, frot = 0, frotV = 7;
+
+    function fallTick() {
+      fvy  += 0.12;   /* reduced gravity for a slower drift */
+      fvx  *= 0.997;
+      fx   += fvx;
+      fy   += fvy;
+      frot += frotV;
+      fig.style.left      = (startL + fx) + 'px';
+      fig.style.top       = (startT + fy) + 'px';
+      fig.style.transform = 'rotate(' + frot + 'deg)';
+      if (startT + fy > window.innerHeight + 80) { fig.remove(); return; }
+      requestAnimationFrame(fallTick);
+    }
+    requestAnimationFrame(fallTick);
+  }, { once: true });
+}());
+</script>
+
+<!-- LEGO CURSOR -->
+<style>* { cursor: none !important; }</style>
+<script>
+(function () {
+  var COLORS = ['#e63946','#ff6b35','#ffd166','#06d6a0','#118ab2','#9b5de5','#f15bb5','#00bbf9'];
+  var SHAPES  = [[1,1],[2,1],[2,2],[4,1],[4,2],[3,1],[2,3],[1,4]];
+
+  var brickIdx  = 0;
+  var colorIdx  = 0;
+  var animScale = 1;
+  var animId    = null;
+  var mx = -300, my = -300;
+  var currentZone = null;
+  var dpr = window.devicePixelRatio || 1;
+
+  var el = document.createElement('canvas');
+  el.style.cssText = 'position:fixed;top:-300px;left:-300px;pointer-events:none;z-index:9999;transition:opacity .15s;';
+  document.body.appendChild(el);
+
+  /* colour helpers */
+  function ph(h) { return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+  function rs(r,g,b) { return 'rgb('+r+','+g+','+b+')'; }
+  function lighten(h,f) { var c=ph(h); return rs(~~Math.min(255,c[0]+(255-c[0])*f),~~Math.min(255,c[1]+(255-c[1])*f),~~Math.min(255,c[2]+(255-c[2])*f)); }
+  function darken(h,f)  { var c=ph(h); return rs(~~(c[0]*(1-f)),~~(c[1]*(1-f)),~~(c[2]*(1-f))); }
+
+  function draw() {
+    var cols = SHAPES[brickIdx][0];
+    var rows = SHAPES[brickIdx][1];
+    var hex  = COLORS[colorIdx];
+    var sc   = animScale;
+
+    var u   = 11;
+    var bh  = 8;
+    var sH  = 4;
+    var sRx = u * 0.30;
+    var sRy = sRx * 0.55;
+    var pad = 4;
+
+    var cW = (cols + rows) * u + pad * 2;
+    var cH = (cols + rows) * u * 0.5 + bh + sH + pad * 2;
+
+    /* render at physical pixels, display at logical size — fixes blur on HiDPI */
+    el.width  = Math.ceil(cW * sc * dpr);
+    el.height = Math.ceil(cH * sc * dpr);
+    el.style.width  = Math.ceil(cW * sc) + 'px';
+    el.style.height = Math.ceil(cH * sc) + 'px';
+
+    var ctx = el.getContext('2d');
+    ctx.clearRect(0, 0, el.width, el.height);
+    ctx.save();
+    ctx.scale(sc * dpr, sc * dpr);
+
+    var ox = rows * u + pad;
+    var oy = sH + pad;
+
+    function iX(c,r) { return ox + (c - r) * u; }
+    function iY(c,r) { return oy + (c + r) * u * 0.5; }
+
+    var cT  = lighten(hex, 0.30);
+    var cB  = hex;
+    var cD  = darken(hex,  0.32);
+    var cST = lighten(hex, 0.55);
+
+    ctx.lineJoin = 'round';
+
+    /* left face */
+    ctx.beginPath();
+    ctx.moveTo(iX(0,rows),    iY(0,rows));
+    ctx.lineTo(iX(0,rows),    iY(0,rows)    + bh);
+    ctx.lineTo(iX(cols,rows), iY(cols,rows) + bh);
+    ctx.lineTo(iX(cols,rows), iY(cols,rows));
+    ctx.closePath();
+    ctx.fillStyle = cD; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.65)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+    /* right face */
+    ctx.beginPath();
+    ctx.moveTo(iX(cols,0),    iY(cols,0));
+    ctx.lineTo(iX(cols,0),    iY(cols,0)    + bh);
+    ctx.lineTo(iX(cols,rows), iY(cols,rows) + bh);
+    ctx.lineTo(iX(cols,rows), iY(cols,rows));
+    ctx.closePath();
+    ctx.fillStyle = cB; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.65)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+    /* top face */
+    ctx.beginPath();
+    ctx.moveTo(iX(0,0),       iY(0,0));
+    ctx.lineTo(iX(cols,0),    iY(cols,0));
+    ctx.lineTo(iX(cols,rows), iY(cols,rows));
+    ctx.lineTo(iX(0,rows),    iY(0,rows));
+    ctx.closePath();
+    ctx.fillStyle = cT; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.65)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+    /* studs back-to-front */
+    for (var d = 0; d < cols + rows; d++) {
+      for (var c2 = 0; c2 < cols; c2++) {
+        var r2 = d - c2;
+        if (r2 < 0 || r2 >= rows) continue;
+        var sx = iX(c2 + 0.5, r2 + 0.5);
+        var sy = iY(c2 + 0.5, r2 + 0.5);
+
+        /* cylinder side */
+        ctx.beginPath();
+        ctx.moveTo(sx - sRx, sy);
+        ctx.lineTo(sx - sRx, sy - sH);
+        ctx.ellipse(sx, sy - sH, sRx, sRy, 0, Math.PI, 0, true);
+        ctx.lineTo(sx + sRx, sy);
+        ctx.ellipse(sx, sy, sRx, sRy, 0, 0, Math.PI, false);
+        ctx.closePath();
+        ctx.fillStyle = cT; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 0.4; ctx.stroke();
+
+        /* stud top */
+        ctx.beginPath();
+        ctx.ellipse(sx, sy - sH, sRx, sRy, 0, 0, Math.PI * 2);
+        ctx.fillStyle = cST; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 0.4; ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+
+    el.style.left = (mx - ox * sc) + 'px';
+    el.style.top  = (my - oy * sc) + 'px';
+  }
+
+  function popAnim() {
+    if (animId) cancelAnimationFrame(animId);
+    var t0 = performance.now();
+    (function pop() {
+      var t = Math.min(1, (performance.now() - t0) / 260);
+      animScale = 1 + 0.45 * Math.pow(1 - t, 2);
+      draw();
+      if (t < 1) { animId = requestAnimationFrame(pop); }
+      else { animScale = 1; animId = null; }
+    })();
+  }
+
+  /* map any element to its nearest named zone node */
+  function getZone(target) {
+    return target.closest && (
+      target.closest('.work-card')            ||
+      target.closest('.work-list-row')        ||
+      target.closest('.product-card')         ||
+      target.closest('.project-hero')         ||
+      target.closest('.project-meta')         ||
+      target.closest('.project-description')  ||
+      target.closest('.media-full')           ||
+      target.closest('.media-half')           ||
+      target.closest('.project-nav-item')     ||
+      target.closest('.about-left')           ||
+      target.closest('.about-right')          ||
+      target.closest('.inquiry-info')         ||
+      target.closest('.inquiry-form-wrap')    ||
+      target.closest('.thanks-wrap')          ||
+      target.closest('.hero-band')            ||
+      target.closest('.shop-notice')          ||
+      target.closest('#nav')                  ||
+      target.closest('.view-toggle')          ||
+      target.closest('footer')
+    ) || null;
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX; my = e.clientY;
+    el.style.opacity = '1';
+    draw();
+  });
+
+  document.addEventListener('mouseover', function(e) {
+    var zone = getZone(e.target);
+    if (zone && zone !== currentZone) {
+      currentZone = zone;
+      brickIdx = (brickIdx + 1) % SHAPES.length;
+      colorIdx = (colorIdx + 1) % COLORS.length;
+      popAnim();
+    }
+  });
+
+  document.addEventListener('mouseleave', function() { el.style.opacity = '0'; });
+  document.addEventListener('mouseenter', function() { el.style.opacity = '1'; });
+
+  draw();
+})();
+</script>
+</body>
+</html>
