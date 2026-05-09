@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sounds in Space — J.SALIBA</title>
+<title>6:00PM on a Saturday Night — Shop — J.SALIBA</title>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body class="page">
@@ -11,9 +11,9 @@
 <nav id="nav" class="light">
   <a href="../index.html" class="nav-logo">J<span class="dot">.</span>SALIBA</a>
   <div class="nav-links">
-    <a href="../work.html" class="active">Work</a>
+    <a href="../work.html">Work</a>
     <a href="../about.html">About</a>
-    <a href="../shop.html">Shop</a>
+    <a href="../shop.html" class="active">Shop</a>
     <a href="../inquiry.html">Inquiry</a>
   </div>
   <button class="nav-burger" id="burger" aria-label="Menu"><span></span><span></span></button>
@@ -27,98 +27,87 @@
   <a href="../inquiry.html">Inquiry</a>
 </div>
 
-<div class="project-hero">
-  <img src="../media/soundsin%20space%20(3).jpg" alt="Sounds in Space">
-  <div class="project-hero-title">
-    <h1>Sounds<br>in Space</h1>
-  </div>
-</div>
+<div class="shop-product-layout">
 
-<div class="project-body">
-
-  <div class="project-meta">
-    <div class="project-meta-item">
-      <span class="project-meta-label">Year</span>
-      <span class="project-meta-value">2022</span>
+  <div class="shop-gallery">
+    <div class="shop-gallery-main" id="gallery-main">
+      <img src="../media/fridaynight%20(1).jpeg" alt="6:00PM on a Saturday Night" id="gallery-main-img" style="width:100%;height:100%;object-fit:cover;">
     </div>
-    <div class="project-meta-item">
-      <span class="project-meta-label">Category</span>
-      <span class="project-meta-value">Installation</span>
-    </div>
-    <div class="project-meta-item">
-      <span class="project-meta-label">Client</span>
-      <span class="project-meta-value">Self-initiated</span>
-    </div>
-    <div class="project-meta-item">
-      <span class="project-meta-label">Collaborators</span>
-      <span class="project-meta-value">—</span>
-    </div>
-    <div class="project-meta-item">
-      <span class="project-meta-label">Tags</span>
-      <div class="project-meta-value tag-list">
-        <span class="tag">Sound Art</span>
-        <span class="tag">Spatial Audio</span>
-        <span class="tag">Installation</span>
-        <span class="tag">Architecture</span>
+    <div class="shop-gallery-thumbs">
+      <div class="shop-gallery-thumb active" data-src="../media/fridaynight%20(1).jpeg" data-type="img" onclick="switchView(this)">
+        <img src="../media/fridaynight%20(1).jpeg" alt="View 01" style="width:100%;height:100%;object-fit:cover;">
       </div>
-    </div>
-    <div class="project-meta-item" style="margin-top:var(--s8);">
-      <a href="../inquiry.html" style="font-family:var(--f-mono);font-size:0.6875rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-ink);border-bottom:1px solid var(--color-ink);">Commission similar &rarr;</a>
-    </div>
-  </div>
-
-  <div class="project-description">
-    <p class="lead">
-      A spatial sound installation exploring the acoustic relationship between body, architecture, and memory — treating rooms as resonant instruments.
-    </p>
-    <div class="body-text">
-      <p>
-        Every architectural space has an acoustic signature: the particular way it absorbs, reflects, and shapes sound. <em>Sounds in Space</em> makes this signature audible and experiential, using multi-channel playback to distribute sound through a space so that listeners become aware of the room itself as a sounding body.
-      </p>
-      <p>
-        The work was developed through an extended listening practice in the installation site: impulse response recordings taken across multiple positions, field recordings of the building in use and at rest, and vocal material produced specifically in response to the space's acoustic character. These elements are composed into a layered, durational piece that shifts over time, requiring visitors to move through the space rather than occupy a fixed listening position.
-      </p>
-      <p>
-        The installation takes its title seriously — not "sound in space" (an arrangement) but "sounds in space" (a plural, heterogeneous encounter). Different frequencies reach the ear from different angles and distances; the experience is not identical for any two listeners, and changes as visitors move.
-      </p>
-    </div>
-
-    <div class="project-credits">
-      <div>
-        <span class="credit-role">Concept &amp; Sound Design</span>
-        <span class="credit-name">Jacob Saliba</span>
+      <div class="shop-gallery-thumb" data-src="../media/fridaynight%20(1).JPG" data-type="img" onclick="switchView(this)">
+        <img src="../media/fridaynight%20(1).JPG" alt="View 02" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="shop-gallery-thumb" data-src="../media/fridaynight%20(1).mov" data-type="video" onclick="switchView(this)">
+        <video src="../media/fridaynight%20(1).mov" style="width:100%;height:100%;object-fit:cover;" muted></video>
+      </div>
+      <div class="shop-gallery-thumb" data-src="../media/fridaynight%20(2).jpeg" data-type="img" onclick="switchView(this)">
+        <img src="../media/fridaynight%20(2).jpeg" alt="View 04" style="width:100%;height:100%;object-fit:cover;">
       </div>
     </div>
   </div>
-</div>
 
-<div class="media-gallery">
+  <div class="shop-info">
+    <div class="shop-breadcrumb">
+      <a href="../shop.html">Shop</a>
+      <span>/</span>
+      <span>Original</span>
+    </div>
 
-  <div class="media-full">
-    <iframe src="https://www.youtube.com/embed/naWdUJ-DhxU" style="width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <span class="shop-type-tag">Original</span>
+    <div class="shop-item-edition">DOC studio. We are both Obsolete.</div>
+    <h1 class="shop-item-title">6:00PM on a Saturday Night<br>(04/02/2004)</h1>
+
+    <div class="shop-price-group">
+      <span class="shop-price-label">Price</span>
+      <div class="shop-item-price">&euro;700</div>
+    </div>
+
+    <div class="shop-cta-group">
+      <button class="btn-purchase" id="btn-purchase">Purchase &rarr;</button>
+      <a class="btn-enquire" href="../inquiry.html">Enquire &rarr;</a>
+    </div>
+
+    <div class="shop-specs">
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Medium</span>
+        <span class="shop-spec-value">Acrylic painting on wood</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Year</span>
+        <span class="shop-spec-value">2025</span>
+      </div>
+      <div class="shop-spec-row">
+        <span class="shop-spec-label">Edition</span>
+        <span class="shop-spec-value">Unique original. One of a kind.</span>
+      </div>
+    </div>
   </div>
 
-  <div class="media-half-pair">
-    <div class="media-half">
-      <img src="../media/soundsin%20space%20(2).jpg" alt="Sounds in Space installation view">
-    </div>
-    <div class="media-half">
-      <img src="../media/soundsin%20space%20(1).jpg" alt="Sounds in Space detail">
+</div>
+
+<!-- ABOUT -->
+<div class="shop-item-body">
+  <div class="shop-item-body-label">
+    <span class="s-label">About</span>
+  </div>
+  <div class="shop-item-body-content">
+    <div class="shop-long-desc">
+      <p>
+        A blue screen of error captures a quiet, transitional era in digital culture. A soft window into a time when technology moved slower, when waiting was part of the experience and when even stillness had depth.
+      </p>
+      <p>
+        Before constant connectivity, computers held a kind of suspense where time stretched, stalled, or simply disappeared. Today, our interactions with technology are faster, louder, and more demanding, defined by endless scrolls and instant feedback. The painting looks back at a moment before that acceleration, when slowness wasn't yet a flaw, and attention wasn't yet fragmented across tabs, feeds, and notifications.
+      </p>
+      <p>
+        It invites us to reconsider the value of pause in a world where digital time rarely stands still.
+      </p>
     </div>
   </div>
-
 </div>
 
-<div class="project-nav">
-  <a class="project-nav-item prev" href="xtect-episodes.html">
-    <span class="project-nav-dir">&larr; Previous</span>
-    <span class="project-nav-title">Xtect Episodes</span>
-  </a>
-  <a class="project-nav-item next" href="in-between-space.html">
-    <span class="project-nav-dir">Next &rarr;</span>
-    <span class="project-nav-title">In Between Space</span>
-  </a>
-</div>
 
 <footer>
   <span class="f-logo">J<span class="dot">.</span>SALIBA</span>
@@ -133,6 +122,38 @@
 </footer>
 
 <script>
+/* ─────────────────────────────────────────────────────
+   STRIPE PAYMENT LINK
+   1. Go to dashboard.stripe.com → Payment Links → Create
+   2. Paste the URL below (starts with https://buy.stripe.com/...)
+   3. The Purchase button activates automatically
+─────────────────────────────────────────────────────── */
+var STRIPE_LINK = ''; // ← paste your URL here
+
+document.getElementById('btn-purchase').addEventListener('click', function() {
+  if (STRIPE_LINK) { window.open(STRIPE_LINK, '_blank'); }
+  else { window.location.href = '../inquiry.html'; }
+});
+
+function switchView(thumb) {
+  document.querySelectorAll('.shop-gallery-thumb').forEach(function(t) { t.classList.remove('active'); });
+  thumb.classList.add('active');
+  var main = document.getElementById('gallery-main');
+  var src = thumb.dataset.src;
+  var type = thumb.dataset.type;
+  main.innerHTML = '';
+  if (type === 'video') {
+    var v = document.createElement('video');
+    v.src = src; v.controls = true; v.autoplay = true; v.muted = true; v.loop = true; v.volume = 0;
+    v.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    main.appendChild(v);
+  } else {
+    var img = document.createElement('img');
+    img.src = src; img.alt = '6:00PM on a Saturday Night';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    main.appendChild(img);
+  }
+}
 document.getElementById('burger').addEventListener('click', function() {
   document.getElementById('nav-overlay').classList.add('open');
 });
@@ -186,7 +207,7 @@ document.addEventListener('keydown', function(e) {
     el.style.left=(mx-ox*sc)+'px'; el.style.top=(my-oy*sc)+'px';
   }
   function popAnim(){if(animId)cancelAnimationFrame(animId);var t0=performance.now();(function pop(){var t=Math.min(1,(performance.now()-t0)/260);animScale=1+0.45*Math.pow(1-t,2);draw();if(t<1){animId=requestAnimationFrame(pop);}else{animScale=1;animId=null;}})();}
-  function getZone(target){return target.closest&&(target.closest('.work-card')||target.closest('.work-list-row')||target.closest('.product-card')||target.closest('.project-hero')||target.closest('.project-meta')||target.closest('.project-description')||target.closest('.media-full')||target.closest('.media-half')||target.closest('.project-nav-item')||target.closest('.about-left')||target.closest('.about-right')||target.closest('.inquiry-info')||target.closest('.inquiry-form-wrap')||target.closest('.thanks-wrap')||target.closest('.hero-band')||target.closest('.shop-notice')||target.closest('#nav')||target.closest('.view-toggle')||target.closest('footer'))||null;}
+  function getZone(target){return target.closest&&(target.closest('.shop-gallery')||target.closest('.shop-info')||target.closest('.shop-item-body')||target.closest('.shop-related-wrap')||target.closest('.product-card')||target.closest('#nav')||target.closest('footer'))||null;}
   document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;el.style.opacity='1';draw();});
   document.addEventListener('mouseover',function(e){var zone=getZone(e.target);if(zone&&zone!==currentZone){currentZone=zone;brickIdx=(brickIdx+1)%SHAPES.length;colorIdx=(colorIdx+1)%COLORS.length;popAnim();}});
   document.addEventListener('mouseleave',function(){el.style.opacity='0';});
