@@ -638,6 +638,145 @@ cvs.addEventListener('wheel', function(e) {
 
 cvs.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
+/* ---- TOUCH / MOBILE ---- */
+var touchPinchDist      = 0;
+var touchPanMidX        = 0;
+var touchPanMidY        = 0;
+var touchOrbitX         = 0;
+var touchOrbitY         = 0;
+var touchOrbitTheta     = 0;
+var touchOrbitPhi       = 0;
+var touchIsDraggingNode = false;
+var touchOrbitActive    = false;
+var touchTwoActive      = false;
+
+function touchDist(a, b) {
+  var dx = a.clientX - b.clientX;
+  var dy = a.clientY - b.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+cvs.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  var ts = e.touches;
+
+  if (ts.length === 1) {
+    touchTwoActive = false;
+    var fake = { clientX: ts[0].clientX, clientY: ts[0].clientY };
+    var hit = pickNode(fake);
+    if (hit) {
+      dragNd          = hit;
+      dragged         = false;
+      dragVertical    = false;
+      touchIsDraggingNode = true;
+      touchOrbitActive    = false;
+      setNDC(fake);
+      rc.setFromCamera(mNDC, camera);
+      dragPlaneH.set(new THREE.Vector3(0, 1, 0), -hit.grp.position.y);
+      if (rc.ray.intersectPlane(dragPlaneH, plHit)) {
+        dragOff.copy(hit.grp.position).sub(plHit);
+      } else { dragOff.set(0, 0, 0); }
+    } else {
+      touchIsDraggingNode = false;
+      touchOrbitActive    = true;
+      touchOrbitX         = ts[0].clientX;
+      touchOrbitY         = ts[0].clientY;
+      touchOrbitTheta     = sTheta;
+      touchOrbitPhi       = sPhi;
+    }
+  } else if (ts.length >= 2) {
+    dragNd              = null;
+    touchIsDraggingNode = false;
+    touchOrbitActive    = false;
+    touchTwoActive      = true;
+    touchPinchDist = touchDist(ts[0], ts[1]);
+    touchPanMidX   = (ts[0].clientX + ts[1].clientX) / 2;
+    touchPanMidY   = (ts[0].clientY + ts[1].clientY) / 2;
+  }
+}, { passive: false });
+
+cvs.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  var ts = e.touches;
+
+  if (ts.length === 1 && touchOrbitActive) {
+    var dx = (ts[0].clientX - touchOrbitX) * 0.006;
+    var dy = (ts[0].clientY - touchOrbitY) * 0.006;
+    sTheta = touchOrbitTheta - dx;
+    sPhi   = Math.max(0.12, Math.min(Math.PI - 0.12, touchOrbitPhi + dy));
+    syncCam();
+  } else if (ts.length === 1 && touchIsDraggingNode && dragNd) {
+    dragged = true;
+    var fake = { clientX: ts[0].clientX, clientY: ts[0].clientY };
+    setNDC(fake);
+    rc.setFromCamera(mNDC, camera);
+    if (rc.ray.intersectPlane(dragPlaneH, plHit)) {
+      dragNd.grp.position.x = plHit.x + dragOff.x;
+      dragNd.grp.position.z = plHit.z + dragOff.z;
+    }
+    refreshAllConns();
+    if (dragNd === selectedNd) {
+      document.getElementById('y-val').textContent = dragNd.grp.position.y.toFixed(1);
+    }
+  } else if (ts.length >= 2 && touchTwoActive) {
+    var dist = touchDist(ts[0], ts[1]);
+
+    // Pinch zoom
+    var pinchDelta = touchPinchDist - dist;
+    sRadius = Math.max(6, Math.min(500, sRadius + pinchDelta * 0.18));
+    touchPinchDist = dist;
+
+    // 2-finger pan
+    var midX = (ts[0].clientX + ts[1].clientX) / 2;
+    var midY = (ts[0].clientY + ts[1].clientY) / 2;
+    var pdx  = midX - touchPanMidX;
+    var pdy  = midY - touchPanMidY;
+    touchPanMidX = midX;
+    touchPanMidY = midY;
+
+    var cdir = new THREE.Vector3().subVectors(panTarget, camera.position).normalize();
+    _panRight.crossVectors(cdir, _panUp).normalize();
+    var sens = sRadius * 0.0015;
+    panTarget.addScaledVector(_panRight, -pdx * sens);
+    panTarget.y += pdy * sens;
+    syncCam();
+  }
+}, { passive: false });
+
+cvs.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  var remaining = e.touches.length;
+
+  if (remaining === 0) {
+    if (touchIsDraggingNode && dragNd && !dragged) selectNode(dragNd);
+    dragNd              = null;
+    dragged             = false;
+    touchIsDraggingNode = false;
+    touchOrbitActive    = false;
+    touchTwoActive      = false;
+  } else if (remaining === 1) {
+    // Transitioned from 2 fingers to 1 — restart orbit
+    touchTwoActive      = false;
+    dragNd              = null;
+    touchIsDraggingNode = false;
+    touchOrbitActive    = true;
+    touchOrbitX         = e.touches[0].clientX;
+    touchOrbitY         = e.touches[0].clientY;
+    touchOrbitTheta     = sTheta;
+    touchOrbitPhi       = sPhi;
+  }
+}, { passive: false });
+
+// Swap hints on touch devices
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  document.getElementById('hints').innerHTML =
+    '<div>1 FINGER &rarr; ORBIT</div>' +
+    '<div>2 FINGER DRAG &rarr; PAN</div>' +
+    '<div>PINCH &rarr; ZOOM</div>' +
+    '<div>TAP BRICK &rarr; SELECT</div>' +
+    '<div>DRAG BRICK &rarr; MOVE</div>';
+}
+
 /* ---- PANEL CONTROLS ---- */
 document.getElementById('btn-yup').addEventListener('click', function() {
   if (!selectedNd) return;
